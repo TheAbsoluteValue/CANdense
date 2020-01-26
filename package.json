@@ -11,6 +11,10 @@
    "license": "ISC",
    "dependencies": {
       "electron": "^7.1.10",
-      "serialport": "^8.0.6"
+      "serialport": "^8.0.6",
+      "tableify": "^1.1.0"
+   },
+   "devDependencies": {
+      "electron-rebuild": "^1.9.0"
    }
 }
