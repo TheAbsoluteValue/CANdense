@@ -23,30 +23,41 @@ port.on('open', () => {
 
 // write message to buffer
 //mockMessage = Buffer.from('420 69 69420');
-//port.write(mockMessage)//, () => {
+//port.write(mockMessage);//, () => {
   //console.log('Message written successfully!');
   //console.log('Last write: ', port.binding.lastWrite.toString('utf8'));
 //})
 
-var numdata = 0
+numdata = 0;
 port.on('data', data => {
-    console.log(`Received data ${numdata}:\n`, data.toString());
-    numdata++;
-    console.log('ENDDATA\n\n');
+  //rl.pause();
+  console.log(`Received data ${numdata}: `, data.toString());
+  console.log('ENDDATA\n\n');
+  numdata++;
+  //setTimeout(() => {rl.resume}, 2000);
 
     // const dataSplit = data.toString().split(' ');
     // messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
     // console.log(messages);
 });
 
+// const readStream = fs.createReadStream('test_CANdump1.log');
+// readStream.on('data', data => {
+//   data.toString().split('\n').forEach(line => {
+//     const a = line.split(' ');
+//     port.write(a);
+//     });
+// });
+
 // read the test CAN dump line by line and then write to the data port
 const rl = readline.createInterface({
-  input: fs.createReadStream('test_CANdump1.log'),
+  input: fs.createReadStream('test_CANdump1.log')
 });
-rl.on('line', (line) => {
-  port.write(Buffer(`${line}\n\n`));
-})
-rl.close()
+
+rl.on('line', (message) => {
+  // Why is this writing a bunch of lines when calling port.write?????
+  port.write(Buffer.from(message));
+});
 
 
 // have the port pretend like it received data (without actually calling port, write, I think)
