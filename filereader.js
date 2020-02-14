@@ -1,12 +1,11 @@
 const fs = require('fs');
-const path = 'C:/Users/Ryan/Desktop/JSON.json';
+const path = './data.json';
 
 try {
     if (fs.existsSync(path)) {
         let data = fs.readFileSync(path);
-        console.log(data);
-        let parseData = JSON.parse(data);
-        console.log(parseData);
+        let parsedData = JSON.parse(data);
+        console.log(parsedData);
     } else { 
         console.log('file not found!');
     }   
