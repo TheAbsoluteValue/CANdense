@@ -1,9 +1,10 @@
 const SerialPort = require('serialport');
 const MockBinding = require('@serialport/binding-mock');
-// const Readline = require('@serialport/parser-readline');
+const Readline = require('@serialport/parser-readline');
 const tableify = require('tableify');
-const readline = require('readline');
-const fs = require('fs');  // for creating a file stream (fs.ReadStream)
+const fs = require('fs');
+const stream = require('stream');
+
 
 const messages = {};
 
@@ -17,48 +18,50 @@ const port = new SerialPort('PORT_PATH', { // for testing
     parser: SerialPort.parsers.readline
 });
 
-port.on('open', () => {
-    console.log('port opened');
-});
+console.log(port.on('open', () => {
+    console.log('Incoming data port opened.');
+}));
 
-// write message to buffer
-//mockMessage = Buffer.from('420 69 69420');
-//port.write(mockMessage);//, () => {
-  //console.log('Message written successfully!');
-  //console.log('Last write: ', port.binding.lastWrite.toString('utf8'));
-//})
-
-numdata = 0;
+c = 0
 port.on('data', data => {
-  //rl.pause();
-  console.log(`Received data ${numdata}: `, data.toString());
-  console.log('ENDDATA\n\n');
-  numdata++;
-  //setTimeout(() => {rl.resume}, 2000);
-
-    // const dataSplit = data.toString().split(' ');
-    // messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
-    // console.log(messages);
+  c += 1
+  console.log('DATA');
+  // const dataSplit = data.toString().split(' ');
+  // messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
+  // console.log(messages);
 });
 
-// const readStream = fs.createReadStream('test_CANdump1.log');
-// readStream.on('data', data => {
-//   data.toString().split('\n').forEach(line => {
-//     const a = line.split(' ');
-//     port.write(a);
-//     });
-// });
-
-// read the test CAN dump line by line and then write to the data port
-const rl = readline.createInterface({
-  input: fs.createReadStream('test_CANdump1.log')
+logFile = fs.createReadStream('test_CANdump1.log');
+logFile.on('open', () => {
+  console.log('CAN dump log opened.\n\n\n\n');
+});
+logFile.on('ready', () => {
+  console.log('CAN dump reader is ready.');
+  logFile.pipe(port);
 });
 
-rl.on('line', (message) => {
-  // Why is this writing a bunch of lines when calling port.write?????
-  port.write(Buffer.from(message));
+sum = 0
+logFile.on('data', data => {
+  // var count = (data.toString().match(/\n/g) || []).length;
+  // sum += count
+  // console.log(count);
+
+  // will be reassigned each time buffer is full (see following if statement)
+  var callback = function() {console.log('UH OH');};
+  port.once('drain', () => {
+    callback();
+  });
+
+  lineSplit = data.toString().split('\n');
+  lineSplit.forEach((item, i) => {
+    while(!port.write(Buffer.from(`msg ${i} is ${item}`))) {  // buffer is full
+      console.log(`I = ${i}`);
+      callback = function(){console.log(`msg ${i}`);port.write(Buffer.from(`msg ${i} is ${item}`));};
+    }
+  });
 });
 
-
-// have the port pretend like it received data (without actually calling port, write, I think)
-//port.binding.emitData(mockMessage);
+logFile.on('close', () => {
+  //console.log(`SUM: ${logFile}`);
+  console.log(`COUNT: ${c}`);
+});
