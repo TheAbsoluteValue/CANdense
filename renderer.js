@@ -3,8 +3,9 @@ const MockBinding = require('@serialport/binding-mock');
 const Readline = require('@serialport/parser-readline');
 const tableify = require('tableify');
 const fs = require('fs');
-const stream = require('stream');
+//const stream = require('stream');
 
+console.log('HELLO');
 
 const messages = {};
 
@@ -48,15 +49,11 @@ logFile.on('data', data => {
 
   // will be reassigned each time buffer is full (see following if statement)
   var callback = function() {console.log('UH OH');};
-  port.once('drain', () => {
-    callback();
-  });
 
   lineSplit = data.toString().split('\n');
   lineSplit.forEach((item, i) => {
     while(!port.write(Buffer.from(`msg ${i} is ${item}`))) {  // buffer is full
-      console.log(`I = ${i}`);
-      callback = function(){console.log(`msg ${i}`);port.write(Buffer.from(`msg ${i} is ${item}`));};
+      console.log('WOW');
     }
   });
 });
