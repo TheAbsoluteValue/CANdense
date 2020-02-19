@@ -3,9 +3,7 @@ const MockBinding = require('@serialport/binding-mock');
 const Readline = require('@serialport/parser-readline');
 const tableify = require('tableify');
 const fs = require('fs');
-//const stream = require('stream');
-
-console.log('HELLO');
+//const stream = require('stream');s
 
 const messages = {};
 
@@ -23,13 +21,18 @@ console.log(port.on('open', () => {
     console.log('Incoming data port opened.');
 }));
 
-c = 0
+c = 0;
 port.on('data', data => {
-  c += 1
-  console.log('DATA');
-  // const dataSplit = data.toString().split(' ');
-  // messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
-  // console.log(messages);
+  c++;
+  lineSplit = data.toString().split('\n');
+  lineSplit.forEach(item => {
+    c++;
+    console.log(`SPLIT ${c}: ${item}`);
+  });
+
+  const dataSplit = data.toString().split(' ');
+  messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
+  console.log(messages);
 });
 
 logFile = fs.createReadStream('test_CANdump1.log');
@@ -41,24 +44,7 @@ logFile.on('ready', () => {
   logFile.pipe(port);
 });
 
-sum = 0
+sum = 0;
 logFile.on('data', data => {
-  // var count = (data.toString().match(/\n/g) || []).length;
-  // sum += count
-  // console.log(count);
-
-  // will be reassigned each time buffer is full (see following if statement)
-  var callback = function() {console.log('UH OH');};
-
-  lineSplit = data.toString().split('\n');
-  lineSplit.forEach((item, i) => {
-    while(!port.write(Buffer.from(`msg ${i} is ${item}`))) {  // buffer is full
-      console.log('WOW');
-    }
-  });
-});
-
-logFile.on('close', () => {
-  //console.log(`SUM: ${logFile}`);
-  console.log(`COUNT: ${c}`);
+  port.read(Buffer.from(data)); // meaning port will receive whatever data is
 });

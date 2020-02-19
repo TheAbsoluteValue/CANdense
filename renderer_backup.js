@@ -6,8 +6,6 @@ const fs = require('fs');  // for creating a file stream (fs.ReadStream)
 
 const messages = {};
 
-console.log('WTF');
-
 /* create the binding **/
 SerialPort.Binding = MockBinding;
 // if echo is false, then port.on('data', ...) won't fire
