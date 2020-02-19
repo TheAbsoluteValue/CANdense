@@ -29,10 +29,10 @@ port.on('data', data => {
     c++;
     console.log(`SPLIT ${c}: ${item}`);
   });
-
-  const dataSplit = data.toString().split(' ');
-  messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
-  console.log(messages);
+  // const dataSplit = data.toString().split(' ');
+  // messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
+  // console.log(messages);
+  print('DONE');
 });
 
 logFile = fs.createReadStream('test_CANdump1.log');
