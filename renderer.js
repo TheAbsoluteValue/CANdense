@@ -23,19 +23,18 @@ console.log(port.on('open', () => {
 
 c = 0;
 port.on('data', data => {
-  c++;
   lineSplit = data.toString().split('\n');
+  console.log(lineSplit);
   lineSplit.forEach(item => {
+    //const dataSplit = data.toString().split(' ');
     c++;
-    console.log(`SPLIT ${c}: ${item}`);
+    if (c <= 1) {
+      console.log(`SPLIT ${c}: ${item.toString()}`);
+    }
   });
-  // const dataSplit = data.toString().split(' ');
-  // messages[dataSplit[0]] = {id: dataSplit[0], data: dataSplit.slice(1, dataSplit.length - 1)};
-  // console.log(messages);
-  print('DONE');
 });
 
-logFile = fs.createReadStream('test_CANdump1.log');
+logFile = fs.createReadStream('test_CANdump1_abbreviated.log');
 logFile.on('open', () => {
   console.log('CAN dump log opened.\n\n\n\n');
 });
