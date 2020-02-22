@@ -1,11 +1,11 @@
 const SerialPort = require('serialport');
 const MockBinding = require('@serialport/binding-mock');
-const Readline = require('@serialport/parser-readline');
-const tableify = require('tableify');
+// const Readline = require('@serialport/parser-readline');
+// const tableify = require('tableify');
 const fs = require('fs');
-//const stream = require('stream');s
+//const stream = require('stream');
 
-const messages = {};
+const messages = [];
 
 /* create the binding **/
 SerialPort.Binding = MockBinding;
@@ -24,8 +24,9 @@ console.log(port.on('open', () => {
 c = 0;
 port.on('data', data => {
   lineSplit = data.toString().split('\n');
-  console.log(lineSplit);
   lineSplit.forEach(item => {
+    commaSplit = item.split(',');
+    messages.push(commaSplit);
     //const dataSplit = data.toString().split(' ');
     c++;
     if (c <= 1) {
@@ -33,6 +34,8 @@ port.on('data', data => {
     }
   });
 });
+
+// console.log(messages)
 
 logFile = fs.createReadStream('test_CANdump1_abbreviated.log');
 logFile.on('open', () => {
