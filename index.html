@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html>
+	<!-- make this drop-down select aka title -->
+<h3>CanDense</h3><br><br>
+<div class="table">
 
-    <head>
-	<meta charset="UTF-8">
-	<title>Hello World!!</title>
-	<style>
-	 table { border-collapse: collapse; }
-	 table, th, td { border: 1px solid black; }
-	</style>
-    </head>
+	<table>
+		<thead>
+			<th>ID</th>
+			<th>Message</th>
+			<th>Time Stamp</th>
+			<th>count</th>
+		</thead>
+		<tbody id="tableData">
+			<script src="./filereader.js"></script>
+		</tbody>
+	</table>
 
-    <body>
-	<h1>Hello World!</h1>
+</div>
 
-	We are using Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, Electron <span id="electron-version"></span>, and Serialport <span id="serialport-version"></span>
+<!-- make this user input -->
+<p>notes</p>
 
-	<div id="error"></div>
-	<div id="ports"></div>
-    </body>
+<div id="error"></div>
+<div id="ports"></div>
 
-	<script src="./renderer.js"></script>
-	<script src="./filereader.js"></script>
 
+<!-- <script src="./renderer.js"></script> -->
 </html>
