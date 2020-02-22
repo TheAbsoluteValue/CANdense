@@ -1,7 +1,6 @@
 const SerialPort = require('serialport');
 const MockBinding = require('@serialport/binding-mock');
-// const Readline = require('@serialport/parser-readline');
-// const tableify = require('tableify');
+const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 //const stream = require('stream');
 
@@ -27,6 +26,21 @@ port.on('data', data => {
   lineSplit.forEach(item => {
     commaSplit = item.split(',');
     messages.push(commaSplit);
+    for(var i = 1; i <= 1; i++) {
+      var timestamp = messages[i][0].substring(0, 19);
+      var id = messages[i][0].substring(25, 28);
+      var info = messages[i][0].substring(29, messages[i][0].length);
+      console.log(timestamp, id, info);
+    };
+    // console.log(messages[1][0]);
+    // console.log(messages[1][0].substring(29, messages[1][0].length));
+    // var timestamp = messages[1][0].substring(0, 19);
+    // var id = messages[1][0].substring(25, 28);
+    // var info = messages[1][0].substring(29, messages[1][0].length);
+    // console.log(timestamp, id, info);
+    // for (var i = 1; i < messages.length; i++) {
+    //   console.log(messages[i].indexOf("("));
+    // }
     //const dataSplit = data.toString().split(' ');
     c++;
     if (c <= 1) {
@@ -34,8 +48,7 @@ port.on('data', data => {
     }
   });
 });
-
-// console.log(messages)
+console.log(messages);
 
 logFile = fs.createReadStream('test_CANdump1_abbreviated.log');
 logFile.on('open', () => {

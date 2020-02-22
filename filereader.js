@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = './data.json';
+const rendererPath = './renderer.js'
+const logPath = './test_CANdump1_abbreviated.log'
 const tableify = require('tableify');
 
 try {
@@ -17,7 +19,7 @@ try {
         var html = tableify(messages);
 
         // write to DOM
-        document.getElementById("carMake").innerHTML = title ? title : 'CanDense' ;
+        document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
         document.getElementById("notes").innerHTML = note ? note : 'notes';
         document.getElementById("table").innerHTML = html;
     } else { 
