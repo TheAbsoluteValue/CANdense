@@ -2,9 +2,9 @@
 	"_id": "1",
 	"title": "2010 Honda Accord",
 	"data": [{
-		"_id": "1",
-		"decodedMessage": "some data",
-		"timeStamp": "UTC",
+		"ID": "1",
+		"message": "some data",
+		"time": "UTC",
 		"count": 1
 	}],
 	"label": "",
