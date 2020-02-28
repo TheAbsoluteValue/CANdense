@@ -16,6 +16,8 @@ var dataJson = {
 	"note": ""
 };
 
+var sortedDataJson = {};
+
 try {
     // if file exists
     if (fs.existsSync(logPath)) {
@@ -40,12 +42,13 @@ try {
                 }
                 // console.log(dataJson);
 
-                // make sure proceding is done within the callback
+                // sort by ID, store in obj
+                var sortedDataJson = sortById(dataJson.data);
 
                 // store title, note, data for use with DOM
                 var title = dataJson['title'];
                 var note = dataJson['note'];
-                var message = dataJson['data'];
+                var message = sortedDataJson;
 
                 // create table from JSON data array
                 var html = tableify(message);
@@ -54,6 +57,8 @@ try {
                 document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
                 document.getElementById("notes").innerHTML = note ? note : 'notes';
                 document.getElementById("table").innerHTML = html;
+
+                // make sure preceding is done within callback
             }
         });
     } else { 
@@ -61,4 +66,9 @@ try {
     }   
 } catch (err) {
     console.error(err);
+}
+
+// sort by ID, then combine like messages within same ID
+function sortById(data) {
+    return data.sort((a, b) => (a.ID > b.ID) ? 1 : -1);
 }
