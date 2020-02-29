@@ -7,10 +7,10 @@ var dataJson = {
 	"_id": "1",
 	"title": "2010 Honda Accord",
 	"data": [{
-		"ID": "1",
-		"message": "some data",
-		"time": "UTC",
-		"count": 1
+        "ID": "1",
+		"Message": "some data",
+		"Time": "UTC",
+		"Count": 1
 	}],
 	"label": "",
 	"note": ""
@@ -35,12 +35,20 @@ try {
                     var timestamp = lineSplit[i].substring(0, 19);
                     var id = lineSplit[i].substring(25, 28);
                     var info = lineSplit[i].substring(29, lineSplit[i].length);
-                    dataJson.data.push({"ID":id,"message":info,"time":timestamp,"count":1});
+                    dataJson.data.push({"ID":id,"Message":info,"Time":timestamp,"Count":1});
                     }
                 }
                 // console.log(dataJson);
 
-                // make sure proceding is done within the callback
+                // sort by ID, store in temp JSON obj
+                var sortedDataJson = sortById(dataJson.data);
+
+                // reduce JSON to group messages under the same ID
+                var groupedData = groupMessagesById(sortedDataJson);
+
+                // reduce JSON to combine messages and update Time / Count
+                dataJson.data = reduceMessages(groupedData);
+                console.log(dataJson);
 
                 // store title, note, data for use with DOM
                 var title = dataJson['title'];
@@ -54,6 +62,8 @@ try {
                 document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
                 document.getElementById("notes").innerHTML = note ? note : 'notes';
                 document.getElementById("table").innerHTML = html;
+
+                // make sure preceding is done within callback
             }
         });
     } else { 
@@ -61,4 +71,32 @@ try {
     }   
 } catch (err) {
     console.error(err);
+}
+
+// sort by ID, then combine like messages within same ID
+function sortById(data) {
+    return data.sort((a, b) => (a.ID > b.ID) ? 1 : -1);
+}
+
+// reduce messages array so that message is found under each common ID
+function groupMessagesById(data) {
+    const result = data.reduce((msg, {ID, Message, Time, Count}) => {
+        const similarIds = msg.find(i => i.ID === ID);
+        if (similarIds) {
+            similarIds.Messages.push({Message, Time, Count});
+        } else {
+            msg.push({ID, Messages: [{Message, Time, Count}]});
+        }
+        return msg;
+    }, []);
+    return result;
+}
+
+function reduceMessages(data) {
+    const result = data.reduce((msg, v) => {
+        const similarMsg = msg.find(i => i.Message === v.Message);
+        if (similarMsg) {
+            
+        }
+    });
 }
