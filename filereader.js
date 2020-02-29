@@ -11,7 +11,8 @@ var dataJson = {
 		"Message": "some data",
 		"Time": "UTC",
 		"Count": 1
-	}],
+    }],
+    "Count": 1,
 	"label": "",
 	"note": ""
 };
@@ -43,17 +44,34 @@ try {
                 // sort by ID, store in temp JSON obj
                 var sortedDataJson = sortById(dataJson.data);
 
+                // get number of messages for each ID, will be seperate table
+                var occurences = {};
+                // reduce the sorted data JSON to an object of key-value -> id: count
+                occurences = countMessagesById(sortedDataJson);
+                // convert the object to an array
+                occurencesArr = Object.entries(occurences);
+                // sort the array, because for some reason it's unsorted now
+                occurencesArr = sortOccurencesArray(occurencesArr);
+                // give headers to array - for UI table purposes
+                occurencesArr.unshift(["ID", "Count"]);
+                console.log(occurencesArr);
+
                 // store title, note, data for use with DOM
                 var title = dataJson['title'];
                 var note = dataJson['note'];
                 var message = sortedDataJson;
 
-                // create table from JSON data array
+                // if you want unsorted, use line below instead of line above
+                // var message = dataJson['data'];
+
+                // create tables from JSON data array
+                var occurencesHtml = tableify(occurencesArr);
                 var html = tableify(message);
                     
                 // write to DOM
                 document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
                 document.getElementById("notes").innerHTML = note ? note : 'notes';
+                document.getElementById("occurenceTable").innerHTML = occurencesHtml;
                 document.getElementById("table").innerHTML = html;
 
                 // make sure preceding is done within callback
@@ -69,4 +87,20 @@ try {
 // sort by ID, then combine like messages within same ID
 function sortById(data) {
     return data.sort((a, b) => (a.ID > b.ID) ? 1 : -1);
+}
+
+// reduce sortedData object to count the number of occurences of each ID. reduce(accumulator, current_val)
+function countMessagesById(data) {
+    console.log(data);
+    const result = data.reduce(function(msgs, val) {
+        msgs[val.ID] = (msgs[val.ID] || 0) + 1;
+        return msgs;
+     }, {});
+     console.log(result);
+     return result;
+}
+
+// needed this for sorting array of message occurences per ID
+function sortOccurencesArray(arr) {
+    return arr.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
 }
