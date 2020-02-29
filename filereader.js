@@ -8,9 +8,9 @@ var dataJson = {
 	"title": "2010 Honda Accord",
 	"data": [{
 		"ID": "1",
-		"message": "some data",
-		"time": "UTC",
-		"count": 1
+		"Message": "some data",
+		"Time": "UTC",
+		"Count": 1
 	}],
 	"label": "",
 	"note": ""
@@ -37,7 +37,7 @@ try {
                     var timestamp = lineSplit[i].substring(0, 19);
                     var id = lineSplit[i].substring(25, 28);
                     var info = lineSplit[i].substring(29, lineSplit[i].length);
-                    dataJson.data.push({"ID":id,"message":info,"time":timestamp,"count":1});
+                    dataJson.data.push({"ID":id,"Message":info,"Time":timestamp,"Count":1});
                     }
                 }
                 // console.log(dataJson);
