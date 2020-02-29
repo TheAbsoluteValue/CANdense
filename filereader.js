@@ -7,7 +7,7 @@ var dataJson = {
 	"_id": "1",
 	"title": "2010 Honda Accord",
 	"data": [{
-		"ID": "1",
+        "ID": "1",
 		"Message": "some data",
 		"Time": "UTC",
 		"Count": 1
@@ -15,8 +15,6 @@ var dataJson = {
 	"label": "",
 	"note": ""
 };
-
-var sortedDataJson = {};
 
 try {
     // if file exists
@@ -42,7 +40,7 @@ try {
                 }
                 // console.log(dataJson);
 
-                // sort by ID, store in obj
+                // sort by ID, store in temp JSON obj
                 var sortedDataJson = sortById(dataJson.data);
 
                 // store title, note, data for use with DOM
