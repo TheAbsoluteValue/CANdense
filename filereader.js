@@ -54,7 +54,6 @@ try {
                 occurencesArr = sortOccurencesArray(occurencesArr);
                 // give headers to array - for UI table purposes
                 occurencesArr.unshift(["ID", "Count"]);
-                console.log(occurencesArr);
 
                 // store title, note, data for use with DOM
                 var title = dataJson['title'];
@@ -91,12 +90,10 @@ function sortById(data) {
 
 // reduce sortedData object to count the number of occurences of each ID. reduce(accumulator, current_val)
 function countMessagesById(data) {
-    console.log(data);
     const result = data.reduce(function(msgs, val) {
         msgs[val.ID] = (msgs[val.ID] || 0) + 1;
         return msgs;
      }, {});
-     console.log(result);
      return result;
 }
 
