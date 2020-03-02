@@ -2,14 +2,18 @@
 <html>
 <head>
 <!-- make this drop-down select based on files for different makes? -->
+
 <h3 id="carMake" class="customTitle"></h3><br>
 </head>
 
 <body>
-<h3 class="customHeader">Number of Messages by ID</h3>
+<!-- This button is uses to start/pause receiving new messages -->
+<button id="toggleBtn">Start reading</button>
+
+<!-- <h3 class="customHeader">Number of Messages by ID</h3>
 <div id="occurenceTable" class="customTable"></div><br><br><br>
 
-<h3 class="customHeader">Messages from CAN</h3>
+<h3 class="customHeader">Messages from CAN</h3> -->
 <div id="table" class="customTable"></div>
 
 <!-- make this user input -->
@@ -18,11 +22,6 @@
 <div id="error"></div>
 <div id="ports"></div>
 
-<form action="live_read.html">
-    <input type="submit" value="Read live messages"/>
-</form>
-
 </body>
-<!-- <script src="./renderer.js"></script> -->
-<!-- <script src="./filereader.js"></script> -->
+<script src="./live_read.js"></script>
 </html>
