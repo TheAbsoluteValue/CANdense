@@ -43,35 +43,44 @@ var dataJson = {
  let counter = 0;
  parser.on('data', data => {
    let dataSplit = data.toString().split(' ');
-   // get the ID and message data
-   let id = dataSplit[2].slice(0, 3);
-   let messageData = dataSplit[2].slice(4);
+   // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
+   if (dataSplit[2]) {
+     // get the ID and message data
+     let id = dataSplit[2].slice(0, 3);
+     let messageData = dataSplit[2].slice(4);
 
-   // make the time stamp human-readable
-   let unixTimeStamp = dataSplit[0].slice(1, -1);
-   let date = new Date(parseFloat(unixTimeStamp));
-   let hours = date.getHours();
-   let minutes = date.getMinutes();
-   let seconds = date.getSeconds();
-   let milliseconds = date.getMilliseconds();
-   let arr = [hours, minutes, seconds, milliseconds];
-   let timeString = [hours, minutes, seconds, milliseconds].join(':');
+     // make the time stamp human-readable
+     let unixTimeStamp = dataSplit[0].slice(1, -1);
+     let date = new Date(parseFloat(unixTimeStamp));
+     let hours = date.getHours();
+     let minutes = date.getMinutes();
+     let seconds = date.getSeconds();
+     let milliseconds = date.getMilliseconds();
+     let arr = [hours, minutes, seconds, milliseconds];
+     let timeString = [hours, minutes, seconds, milliseconds].join(':');
 
-   dataJson.data.push({"ID": id,
-                       "message": messageData,
-                       "time": timeString,
-                       "count": 1});
-   var title = dataJson['title'];
-   var note = dataJson['note'];
-   var message = dataJson['data'];
+     messages[id] = {"id": id, "data": messageData, "timestamp": timeString};
 
-   // create table from JSON data array
-   var html = tableify(message);
+     // create table from JSON data array
+     var messageHTML = tableify(messages);
+     document.getElementById("table").innerHTML = messageHTML;
+   }
+
+
+   // dataJson.data.push({"ID": id,
+   //                     "message": messageData,
+   //                     "time": timeString,
+   //                     "count": 1});
+   // var title = dataJson['title'];
+   // var note = dataJson['note'];
+   // var message = dataJson['data'];
+
+
 
    // write to DOM
-   document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
-   document.getElementById("notes").innerHTML = note ? note : 'notes';
-   document.getElementById("table").innerHTML = html;
+   // document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
+   // document.getElementById("notes").innerHTML = note ? note : 'notes';
+   // document.getElementById("table").innerHTML = html;
  });
 
 
@@ -82,7 +91,7 @@ var dataJson = {
 
 
  // create the ReadStream (only useful when reading from a log file)
- logFile = fs.createReadStream('test_CANdump1_abbreviated.log');
+ logFile = fs.createReadStream('test_CANdump1.log');
  logFile.on('open', () => {
    logFile.pipe(port);  // send all data to the port
  });
