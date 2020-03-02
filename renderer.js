@@ -40,7 +40,6 @@ var dataJson = {
  */
  // creates the ReadLine parser, which is the final destination for the data
  const parser = port.pipe(new Readline());
- let counter = 0;
  parser.on('data', data => {
    let dataSplit = data.toString().split(' ');
    // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
@@ -59,8 +58,9 @@ var dataJson = {
      let arr = [hours, minutes, seconds, milliseconds];
      let timeString = [hours, minutes, seconds, milliseconds].join(':');
 
-     messages[id] = {"id": id, "data": messageData, "timestamp": timeString};
-
+     // increment the count of the id if it occurs again
+     let messageCount = messages[id] ? messages[id]["count"] : 0;
+     messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
      // create table from JSON data array
      var messageHTML = tableify(messages);
      document.getElementById("table").innerHTML = messageHTML;
