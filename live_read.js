@@ -6,6 +6,7 @@ const tableify = require('tableify');
 
 const messages = {};
 let readToggle = false; // whether we are reading data or not
+let toggleBtn = document.getElementById('toggleBtn');
 
 var dataJson = {
 	"_id": "1",
@@ -28,11 +29,13 @@ MockBinding.createPort('PORT_PATH', {echo: true, record: false});
 const port = new SerialPort('PORT_PATH', { // TESTING port
     baudRate: 115200,
     parser: SerialPort.parsers.readline,
-    highWaterMark: 90  // 90 bytes read before flushing buffer
+    highWaterMark: 90
 });
 
 // ReadStream to read from logFile (test only)
-logFile = fs.createReadStream('test_CANdump1.log');
+logFile = fs.createReadStream('test_CANdump1.log',
+  {highWaterMark: 90} // buffer size of 8 causes faster updates
+);
 
 /*
   How data is read in and parsed:
@@ -86,19 +89,16 @@ function pauseReading() {
 }
 
 function toggleBtnPressed() {
+  console.log(toggleBtn);
   if (readToggle){  // we are reading, so we pause reading
     readToggle = false;
     // when pausing, the button now needs to tell user they can start reading again
-    toggleBtn.innerHTML = "<button onclick='toggleBtnPressed()' id='toggleBtn'>Start Reading</button>";
-    pauseReading();
-    alert("PAUSED");
+    toggleBtn.innerHTML = "Resume reading";
+    setTimeout(pauseReading, 0);
   } else {  // we are not reading, so we start reading
     readToggle = true;
     // when resuming read, the button now needs to tell user they can pause reading again
-    toggleBtn.innerHTML = "<button onclick='toggleBtnPressed()' id='toggleBtn'>Pause Reading</button>";
-    startReading();
-    alert("RESUMED");
+    toggleBtn.innerHTML = "Pause Reading";
+    setTimeout(startReading, 0);
   }
 }
-
-document.getElementById("toggleBtn").addEventListener("click", toggleBtnPressed);
