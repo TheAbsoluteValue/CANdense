@@ -5,8 +5,14 @@ const fs = require('fs');
 const tableify = require('tableify');
 
 const messages = {};
+let loggingLocation;  // path messages will be recorded at
+let logMode;  // if the user wants to append to or truncate that log file
+let fd;  // file descriptor (check docs for fs.open(...) return value)
+let recordingFileStream;  // the stream that is being used to record messages
 let readToggle = false; // whether we are reading data or not
-let toggleBtn = document.getElementById('toggleBtn');
+let recordToggle = false; // wheter we are logging data or not
+let toggleReadBtn = document.getElementById('toggleReadBtn');
+let toggleRecordBtn = document.getElementById('toggleRecordBtn');
 
 var dataJson = {
 	"_id": "1",
@@ -88,17 +94,68 @@ function pauseReading() {
   port.unpipe();
 }
 
-function toggleBtnPressed() {
-  console.log(toggleBtn);
+function toggleReadBtnPressed() {
   if (readToggle){  // we are reading, so we pause reading
     readToggle = false;
+    console.log('Puasing reading');
+    if (recordToggle) {toggleRecordBtnPressed();}  // stop writing when we stop reading
     // when pausing, the button now needs to tell user they can start reading again
-    toggleBtn.innerHTML = "Resume reading";
+    toggleReadBtn.innerHTML = "Resume reading";
     setTimeout(pauseReading, 0);
   } else {  // we are not reading, so we start reading
+    console.log('Resuming reading');
     readToggle = true;
     // when resuming read, the button now needs to tell user they can pause reading again
-    toggleBtn.innerHTML = "Pause Reading";
+    toggleReadBtn.innerHTML = "Pause reading";
     setTimeout(startReading, 0);
   }
+}
+
+/*
+  sets up the file that the user wants to record logs to
+  is called when the user clicks the button next to the text box for
+  specifying the path, or if the user tries to record before the function
+  has been called
+*/
+function setupRecorder() {
+  loggingLocation = document.getElementById("logfile-path").value;
+  // if the user hasn't entered a file name, generate one by default
+  if (!loggingLocation) {loggingLocation = `CAN_${Date.now()}.json`;}
+  if (!loggingLocation.slice(-4) == '.log') {loggingLocation.concat('.log');}
+  logMode = document.querySelector('input[name="log-mode"]:checked').value
+  fd = fs.open(loggingLocation, logMode)
+}
+
+recordingFileStream.on('data', data => {
+  fs.writeFile(fd, data);
+});
+
+function toggleRecordBtnPressed() {
+  if (recordToggle) {  // we are recording, so pause
+    console.log('Pausing recording');
+    recordToggle = false;
+    toggleRecordBtn.innerHTML = "Resume recording";
+    if (!readToggle) {toggleReadBtnPressed();} // start reading if not already
+    setTimeout(0, pauseRecording, file);
+  } else {  // we aren't recording, so resume/start recording
+      recordToggle = true;
+      toggleRecordBtn.innerHTML = "Pause recording";
+      if (!loggingLocation) {setupRecorder();}
+      if (!readToggle) {toggleReadBtnPressed();}
+      setTimeout(0, startRecording);
+  }
+}
+
+function startRecording() {
+  if (!recordingFileStream) {recordingFileStream = fs.createWriteStream(fd);}
+  parser.pipe(recordingFileStream);
+}
+
+function pauseRecording() {
+  parser.unpipe(recordingFileStream);
+}
+
+function writeRecording() {
+  recordingFileStream.end();
+  fs.close(fd);
 }

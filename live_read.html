@@ -7,8 +7,21 @@
 </head>
 
 <body>
-<!-- This button is uses to start/pause receiving new messages -->
-<button onclick="toggleBtnPressed()" id="toggleBtn">Start reading</button>
+<!-- This button is used to start/pause receiving new messages -->
+<button onclick="toggleReadBtnPressed()" id="toggleReadBtn">Start reading</button>
+<br>
+
+<!-- For setting the location to log to -->
+<label for="logfile-path">Log file save location</label>
+<input type="text" id="logfile-path" placeholder="path/to/logfile">
+<button onclick="setupRecorder()" id="setLogPathBtn">Set log path</button>
+<br>
+<!-- For actually logging -->
+<button onclick="toggleRecordBtnPressed()" id="toggleRecordBtn">Start recording</button>
+<input type="radio" name='log-mode' id="append-option" value="a" checked>
+<label for="append-option">append to log file</label>
+<input type="radio" name='log-mode' id="truncate-option" value="w">
+<label for="truncate-option">truncate log file</label>
 
 <!-- <h3 class="customHeader">Number of Messages by ID</h3>
 <div id="occurenceTable" class="customTable"></div><br><br><br>
