@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- make this drop-down select based on files for different makes? -->
+
+<h3 id="carMake" class="customTitle"></h3><br>
+</head>
+
+<body>
+<!-- This button is used to start/pause receiving new messages -->
+<button onclick="toggleReadBtnPressed()" id="toggleReadBtn">Start reading</button>
+<br>
+
+<!-- For setting the location to log to -->
+<label for="logfile-path">Log file save location</label>
+<input type="text" id="logfile-path" placeholder="path/to/logfile.log">
+<button onclick="setupRecorder()" id="setLogPathBtn">Set log path</button>
+<br>
+<!-- For actually logging -->
+<button onclick="toggleRecordBtnPressed()" id="toggleRecordBtn">Start recording</button>
+<input type="radio" name='log-mode' id="append-option" value="a" checked>
+<label for="append-option">append to log file</label>
+<input type="radio" name='log-mode' id="truncate-option" value="w">
+<label for="truncate-option">truncate log file</label>
+<button onclick="endRecording()">Save recording</button>
+
+<!-- <h3 class="customHeader">Number of Messages by ID</h3>
+<div id="occurenceTable" class="customTable"></div><br><br><br>
+
+<h3 class="customHeader">Messages from CAN</h3> -->
+<div id="table" class="customTable"></div>
+
+<!-- make this user input -->
+<p id="notes" class="customNotes"></p>
+
+<div id="error"></div>
+<div id="ports"></div>
+
+</body>
+<script src="./live_read.js"></script>
+</html>
