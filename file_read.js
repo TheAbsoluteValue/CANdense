@@ -66,7 +66,7 @@ try {
                 // create tables from JSON data array
                 var occurencesHtml = tableify(occurencesArr);
                 var html = tableify(message);
-                    
+
                 // write to DOM
                 document.getElementById("carMake").innerHTML = title ? title : 'CanDense';
                 document.getElementById("notes").innerHTML = note ? note : 'notes';
@@ -76,9 +76,9 @@ try {
                 // make sure preceding is done within callback
             }
         });
-    } else { 
+    } else {
         console.log('file not found!');
-    }   
+    }
 } catch (err) {
     console.error(err);
 }
