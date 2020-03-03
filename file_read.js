@@ -2,6 +2,7 @@ const tableify = require('tableify');
 const path = './data.json';
 const rendererPath = './renderer.js';
 const logPath = './test_CANdump1_abbreviated.log';
+const fs = require('fs');
 
 var dataJson = {
 	"_id": "1",
