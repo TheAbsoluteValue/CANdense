@@ -38,6 +38,8 @@ const port = new SerialPort('PORT_PATH', { // TESTING port
     highWaterMark: 90
 });
 
+const parser = port.pipe(new Readline());
+
 // ReadStream to read from logFile (test only)
 logFile = fs.createReadStream('test_CANdump1.log',
   {highWaterMark: 90} // buffer size of 8 causes faster updates
@@ -54,7 +56,6 @@ logFile = fs.createReadStream('test_CANdump1.log',
  */
 function startReading() {
   // creates the ReadLine parser, which is the final destination for the data
-  const parser = port.pipe(new Readline());
   parser.on('data', data => {
     let dataSplit = data.toString().split(' ');
     // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
@@ -97,13 +98,11 @@ function pauseReading() {
 function toggleReadBtnPressed() {
   if (readToggle){  // we are reading, so we pause reading
     readToggle = false;
-    console.log('Puasing reading');
     if (recordToggle) {toggleRecordBtnPressed();}  // stop writing when we stop reading
     // when pausing, the button now needs to tell user they can start reading again
     toggleReadBtn.innerHTML = "Resume reading";
     setTimeout(pauseReading, 0);
   } else {  // we are not reading, so we start reading
-    console.log('Resuming reading');
     readToggle = true;
     // when resuming read, the button now needs to tell user they can pause reading again
     toggleReadBtn.innerHTML = "Pause reading";
@@ -120,34 +119,36 @@ function toggleReadBtnPressed() {
 function setupRecorder() {
   loggingLocation = document.getElementById("logfile-path").value;
   // if the user hasn't entered a file name, generate one by default
-  if (!loggingLocation) {loggingLocation = `CAN_${Date.now()}.json`;}
-  if (!loggingLocation.slice(-4) == '.log') {loggingLocation.concat('.log');}
-  logMode = document.querySelector('input[name="log-mode"]:checked').value
-  fd = fs.open(loggingLocation, logMode)
+  if (!loggingLocation) {loggingLocation = `logs/CAN_${Date.now()}.log`;}
+  if (!loggingLocation.endsWith('.log')) {
+    loggingLocation = loggingLocation.concat('.log');
+  }
+  logMode = document.querySelector('input[name="log-mode"]:checked').value;
+  fd = fs.openSync(loggingLocation, logMode);
 }
-
-recordingFileStream.on('data', data => {
-  fs.writeFile(fd, data);
-});
 
 function toggleRecordBtnPressed() {
   if (recordToggle) {  // we are recording, so pause
-    console.log('Pausing recording');
     recordToggle = false;
     toggleRecordBtn.innerHTML = "Resume recording";
     if (!readToggle) {toggleReadBtnPressed();} // start reading if not already
-    setTimeout(0, pauseRecording, file);
+    setTimeout(0, pauseRecording);
   } else {  // we aren't recording, so resume/start recording
       recordToggle = true;
       toggleRecordBtn.innerHTML = "Pause recording";
       if (!loggingLocation) {setupRecorder();}
       if (!readToggle) {toggleReadBtnPressed();}
-      setTimeout(0, startRecording);
+      startRecording();
   }
 }
 
 function startRecording() {
-  if (!recordingFileStream) {recordingFileStream = fs.createWriteStream(fd);}
+  if (!recordingFileStream) {
+    recordingFileStream = fs.createWriteStream(null, {fd: fd});
+    recordingFileStream.on('data', data => {
+      fs.writeFile(fd, data);
+    });
+  }
   parser.pipe(recordingFileStream);
 }
 
@@ -155,7 +156,9 @@ function pauseRecording() {
   parser.unpipe(recordingFileStream);
 }
 
-function writeRecording() {
+// takes care of cleaning things up when the user is done recording
+function endRecording() {
+  pauseRecording();
   recordingFileStream.end();
-  fs.close(fd);
+  fs.closeSync(fd);
 }
