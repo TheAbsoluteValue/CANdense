@@ -4,13 +4,20 @@ const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 const tableify = require('tableify');
 
+/*
+	This object holds one entry for each ID, where it is updated when another message with the
+	same id is received. Holds the ID, data, timestamp, and count of each message. Is what the table
+	is built from.
+*/
 const messages = {};
+const TEST_LOG_PATH = 'test_CANdump1.log';
+const TEST_MODE = true;  // set to false if connecting to real vehichle
 let loggingLocation;  // path messages will be recorded at
 let logMode;  // if the user wants to append to or truncate that log file
 let fd;  // file descriptor (check docs for fs.open(...) return value)
 let recordingFileStream;  // the stream that is being used to record messages
-let readToggle = false; // whether we are reading data or not
-let recordToggle = false; // wheter we are logging data or not
+let isReading = false; // whether we are reading data or not
+let isRecording = false; // wheter we are logging data or not
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleRecordBtn = document.getElementById('toggleRecordBtn');
 
@@ -27,22 +34,23 @@ var dataJson = {
 	"note": ""
 };
 
-// create the port
+// begin creating the port
 SerialPort.Binding = MockBinding;
 // if echo is false, then port.on('data', ...) won't fire
 MockBinding.createPort('PORT_PATH', {echo: true, record: false});
-//const port = new SerialPort('/dev/ttyUSB0', { // REAL port
+//const port = new SerialPort('/dev/ttyUSB0', { // use instead of the previous line with real car
 const port = new SerialPort('PORT_PATH', { // TESTING port
     baudRate: 115200,
-    parser: SerialPort.parsers.readline,
-    highWaterMark: 90
+    parser: SerialPort.parsers.readline,  // need to split messages at each line
+    highWaterMark: 90  										// max buffer size of the port
 });
 
+// create the parser that emits data at the newline (how our messages are delimited)
 const parser = port.pipe(new Readline());
 
 // ReadStream to read from logFile (test only)
-logFile = fs.createReadStream('test_CANdump1.log',
-  {highWaterMark: 90} // buffer size of 8 causes faster updates
+logFile = fs.createReadStream(TEST_LOG_PATH,
+  {highWaterMark: 90} // max size to buffer when reading from the file
 );
 
 /*
@@ -64,7 +72,7 @@ function startReading() {
       let id = dataSplit[2].slice(0, 3);
       let messageData = dataSplit[2].slice(4);
 
-      // make the time stamp human-readable
+      // make the time stamp dhuman-readable
       let unixTimeStamp = dataSplit[0].slice(1, -1);
       let date = new Date(parseFloat(unixTimeStamp));
       let hours = date.getHours();
@@ -95,20 +103,21 @@ function pauseReading() {
   port.unpipe();
 }
 
+// onclick for #toggleReadBtn (live_read.html)
 function toggleReadBtnPressed() {
-  if (readToggle){  // we are reading, so we pause reading
-    readToggle = false;
-    if (recordToggle) {toggleRecordBtnPressed();}  // stop writing when we stop reading
+  if (isReading){  // we are reading, so this block pauses the read
+    isReading = false;
+    if (isRecording) {toggleRecordBtnPressed();}  // stop writing when we stop reading
     // when pausing, the button now needs to tell user they can start reading again
     toggleReadBtn.innerHTML = "Resume reading";
     setTimeout(pauseReading, 0);
   } else {  // we are not reading, so we start reading
-    readToggle = true;
+    isReading = true;
     // when resuming read, the button now needs to tell user they can pause reading again
     toggleReadBtn.innerHTML = "Pause reading";
     setTimeout(startReading, 0);
   }
-}
+};
 
 /*
   sets up the file that the user wants to record logs to
@@ -127,21 +136,7 @@ function setupRecorder() {
   fd = fs.openSync(loggingLocation, logMode);
 }
 
-function toggleRecordBtnPressed() {
-  if (recordToggle) {  // we are recording, so pause
-    recordToggle = false;
-    toggleRecordBtn.innerHTML = "Resume recording";
-    if (!readToggle) {toggleReadBtnPressed();} // start reading if not already
-    setTimeout(0, pauseRecording);
-  } else {  // we aren't recording, so resume/start recording
-      recordToggle = true;
-      toggleRecordBtn.innerHTML = "Pause recording";
-      if (!loggingLocation) {setupRecorder();}
-      if (!readToggle) {toggleReadBtnPressed();}
-      startRecording();
-  }
-}
-
+// called from toggleRecordBtnPressed
 function startRecording() {
   if (!recordingFileStream) {
     recordingFileStream = fs.createWriteStream(null, {fd: fd});
@@ -152,6 +147,7 @@ function startRecording() {
   parser.pipe(recordingFileStream);
 }
 
+// stop writing from the input to the file; used to end reading the stream
 function pauseRecording() {
   parser.unpipe(recordingFileStream);
 }
@@ -159,6 +155,23 @@ function pauseRecording() {
 // takes care of cleaning things up when the user is done recording
 function endRecording() {
   pauseRecording();
+	// prevent memory leak
   recordingFileStream.end();
   fs.closeSync(fd);
+}
+
+// onclick for #toggleRecordBtn (live_read.html)
+function toggleRecordBtnPressed() {
+	if (isRecording) {  // we are recording, so pause
+    isRecording = false;
+    toggleRecordBtn.innerHTML = "Resume recording";
+    setTimeout(0, pauseRecording);  // TODO: see if this setTimeout is really necessary (doubt it)
+  } else {  // we aren't recording, so resume/start recording
+      isRecording = true;
+      toggleRecordBtn.innerHTML = "Pause recording";
+      if (!loggingLocation) {setupRecorder();}
+			// if we are logging we also ought to be reading (right?)
+      if (!isReading) {toggleReadBtnPressed();}
+      startRecording();
+  }
 }
