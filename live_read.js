@@ -1,4 +1,4 @@
-isRecordingconst SerialPort = require('serialport');
+const SerialPort = require('serialport');
 const MockBinding = require('@serialport/binding-mock');
 const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
@@ -16,7 +16,7 @@ let loggingLocation;  // path messages will be recorded at
 let logMode;  // if the user wants to append to or truncate that log file
 let fd;  // file descriptor (check docs for fs.open(...) return value)
 let recordingFileStream;  // the stream that is being used to record messages
-let readToggle = false; // whether we are reading data or not
+let isReading = false; // whether we are reading data or not
 let isRecording = false; // wheter we are logging data or not
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleRecordBtn = document.getElementById('toggleRecordBtn');
@@ -104,10 +104,9 @@ function pauseReading() {
 }
 
 // onclick for #toggleReadBtn (live_read.html)
-// TODO: change this so that we add event listener in JS rather than HTML
 function toggleReadBtnPressed() {
-  if (readToggle){  // we are reading, so this block pauses the read
-    readToggle = false;
+  if (isReading){  // we are reading, so this block pauses the read
+    isReading = false;
     if (isRecording) {toggleRecordBtnPressed();}  // stop writing when we stop reading
     // when pausing, the button now needs to tell user they can start reading again
     toggleReadBtn.innerHTML = "Resume reading";
@@ -118,7 +117,7 @@ function toggleReadBtnPressed() {
     toggleReadBtn.innerHTML = "Pause reading";
     setTimeout(startReading, 0);
   }
-}
+};
 
 /*
   sets up the file that the user wants to record logs to
@@ -162,9 +161,8 @@ function endRecording() {
 }
 
 // onclick for #toggleRecordBtn (live_read.html)
-// TODO: change this so that we add event listener in JS rather than HTML
 function toggleRecordBtnPressed() {
-  if (isRecording) {  // we are recording, so pause
+	if (isRecording) {  // we are recording, so pause
     isRecording = false;
     toggleRecordBtn.innerHTML = "Resume recording";
     setTimeout(0, pauseRecording);  // TODO: see if this setTimeout is really necessary (doubt it)
@@ -173,7 +171,7 @@ function toggleRecordBtnPressed() {
       toggleRecordBtn.innerHTML = "Pause recording";
       if (!loggingLocation) {setupRecorder();}
 			// if we are logging we also ought to be reading (right?)
-      if (!readToggle) {toggleReadBtnPressed();}
+      if (!isReading) {toggleReadBtnPressed();}
       startRecording();
   }
 }
