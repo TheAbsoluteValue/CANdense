@@ -29,6 +29,7 @@ function readLogFile(path) {
 	let logFileStream = fs.createReadStream(path);
 	// parser will emit data any time a newline occurs
 	const parser = logFileStream.pipe(new Readline());
+	let messageCounts = {}; // counts the number of occurrences of each ID
 
 	parser.on('data', data => {
 		let dataSplit = data.toString().split(' ');
@@ -47,6 +48,14 @@ function readLogFile(path) {
 			let arr = [hours, minutes, seconds, milliseconds];
 			let timeString = [hours, minutes, seconds, milliseconds].join(':');
 
+			// count number of occurrences of each ID
+			if (messageCounts[id]) {
+				messageCounts[id]++;
+			} else {
+				messageCounts[id] = 0;
+			}
+
+			// add to the table that
 			let tableBody = document.querySelector('#table table tbody');
 			let newRow = document.createElement("tr");
 			let idElement = document.createElement('td');
