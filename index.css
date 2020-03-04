@@ -1,0 +1,22 @@
+/*use # for tag id's, use . for tag classes,
+use neither for entire page's tag. */
+#customHeader {
+    padding-top: 5px;
+    padding-bottom: 15px;
+    text-align: center;
+    color: white;
+    font-size: 30px;
+}
+
+body {
+    background: #2B60DE;
+}
+
+#centerAlign {
+    text-align: center;
+}
+
+.IndexBtn {
+    display: inline-block;
+    padding: 10px;
+}
