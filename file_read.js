@@ -2,7 +2,7 @@ const tableify = require('tableify');
 const path = './data.json';
 const fs = require('fs');
 
-document.getElementById('set-path-btn').addEventListener('click', () => {
+document.getElementById('read-btn').addEventListener('click', () => {
 	let filePath = document.getElementById('logfile-path').value;
 	if (!filePath) {
 		alert("Please enter a file path");
@@ -12,7 +12,7 @@ document.getElementById('set-path-btn').addEventListener('click', () => {
 });
 
 function readLogFile(path) {
-	// try {
+	try {
 		fs.readFile(path, {encoding: 'utf-8', flag:'r'}, (err, data) => {
 			if(data){
 					// split the log file on each line, then go through and push necessary elements to JSON
@@ -63,25 +63,25 @@ function readLogFile(path) {
 				alert('The file is empty');
 			}
 		});
-	// } catch (e) {
-	// 	alert(`${path} does not exist`);
-	// }
+	} catch (e) {
+		alert(`${path} does not exist`);
+	}
 }
 
-//
-// var dataJson = {
-// 	"_id": "1",
-// 	"title": "2010 Honda Accord",
-// 	"data": [{
-//         "ID": "1",
-// 		"Message": "some data",
-// 		"Time": "UTC",
-// 		"Count": 1
-//     }],
-//     "Count": 1,
-// 	"label": "",
-// 	"note": ""
-// };
+var dataJson = {
+	"_id": "1",
+	"title": "2010 Honda Accord",
+	"data": [{
+        "ID": "1",
+		"Message": "some data",
+		"Time": "UTC",
+		"Count": 1
+    }],
+    "Count": 1,
+	"label": "",
+	"note": ""
+};
+
 //
 // try {
 //     // if file exists
@@ -149,21 +149,21 @@ function readLogFile(path) {
 //     console.error(err);
 // }
 //
-// // sort by ID, then combine like messages within same ID
-// function sortById(data) {
-//     return data.sort((a, b) => (a.ID > b.ID) ? 1 : -1);
-// }
-//
-// // reduce sortedData object to count the number of occurences of each ID. reduce(accumulator, current_val)
-// function countMessagesById(data) {
-//     const result = data.reduce(function(msgs, val) {
-//         msgs[val.ID] = (msgs[val.ID] || 0) + 1;
-//         return msgs;
-//      }, {});
-//      return result;
-// }
-//
-// // needed this for sorting array of message occurences per ID
-// function sortOccurencesArray(arr) {
-//     return arr.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
-// }
+// sort by ID, then combine like messages within same ID
+function sortById(data) {
+    return data.sort((a, b) => (a.ID > b.ID) ? 1 : -1);
+}
+
+// reduce sortedData object to count the number of occurences of each ID. reduce(accumulator, current_val)
+function countMessagesById(data) {
+    const result = data.reduce(function(msgs, val) {
+        msgs[val.ID] = (msgs[val.ID] || 0) + 1;
+        return msgs;
+     }, {});
+     return result;
+}
+
+// needed this for sorting array of message occurences per ID
+function sortOccurencesArray(arr) {
+    return arr.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
+}
