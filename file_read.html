@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width= d, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+<!-- make this drop-down select based on files for different makes? -->
+<h3 id="carMake" class="customTitle"></h3><br>
 </head>
 <body>
   <input type="text" name="logfile-path" id="logfile-path">
@@ -14,6 +12,15 @@
   <form action="index.html">
     <input type="submit" value="Home">
   </form>
+
+    <h3 class="customHeader">Number of Messages by ID</h3>
+    <div id="occurenceTable" class="customTable"></div><br><br><br>
+    
+    <h3 class="customHeader">Messages from CAN</h3>
+    <div id="table" class="customTable"></div>
+    
+    <!-- make this user input -->
+    <p id="notes" class="customNotes"></p>
 </body>
 <script src="./file_read.js"></script>
 </html>
