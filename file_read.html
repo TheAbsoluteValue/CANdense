@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <!-- make this drop-down select based on files for different makes? -->
-  <h3 id="carMake" class="customTitle"></h3><br>
+<!-- make this drop-down select based on files for different makes? -->
+<h3 id="carMake" class="customTitle"></h3><br>
 </head>
-
 <body>
   <input type="text" name="logfile-path" id="logfile-path">
   <label for="logfile-path">Enter path to log file</label>
@@ -16,28 +14,14 @@
     <input type="submit" value="Home">
   </form>
 
-  <h3 class="customHeader">Number of Messages by ID</h3>
-  <div id="occurenceTable" class="customTable"></div><br><br><br>
+    <h3 class="customHeader">Number of Messages by ID</h3>
+    <div id="occurenceTable" class="customTable"></div><br><br><br>
 
-  <h3 class="customHeader">Messages from CAN</h3>
-  <div id="table" class="customTable">
-    <table>
-      <thead>
-        <tr>
-          <td>ID</td>
-          <td>Data</td>
-          <td>Timestamp</td>
-        </tr>
-      </thead>
-      <tbody>
-        <!--will be filled in dynamically-->
-      </tbody>
-    </table>
-  </div>
+    <h3 class="customHeader">Messages from CAN</h3>
+    <div id="table" class="customTable"></div>
 
-  <!-- make this user input -->
-  <p id="notes" class="customNotes"></p>
+    <!-- make this user input -->
+    <p id="notes" class="customNotes"></p>
 </body>
 <script src="./file_read.js"></script>
-
 </html>

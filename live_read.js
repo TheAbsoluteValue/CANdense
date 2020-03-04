@@ -11,50 +11,46 @@ const tableify = require('tableify');
 */
 const messages = {};
 const TEST_LOG_PATH = 'test_CANdump1.log';
-const TEST_MODE = true; // set to false if connecting to real vehichle
-let loggingLocation; // path messages will be recorded at
-let logMode; // if the user wants to append to or truncate that log file
-let fd; // file descriptor (check docs for fs.open(...) return value)
-let recordingFileStream; // the stream that is being used to record messages
+const TEST_MODE = true;  // set to false if connecting to real vehichle
+let loggingLocation;  // path messages will be recorded at
+let logMode;  // if the user wants to append to or truncate that log file
+let fd;  // file descriptor (check docs for fs.open(...) return value)
+let recordingFileStream;  // the stream that is being used to record messages
 let isReading = false; // whether we are reading data or not
 let isRecording = false; // wheter we are logging data or not
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleRecordBtn = document.getElementById('toggleRecordBtn');
 
 var dataJson = {
-  "_id": "1",
-  "title": "2010 Honda Accord",
-  "data": [{
-    "ID": "1",
-    "message": "some data",
-    "time": "UTC",
-    "count": 1
-  }],
-  "label": "",
-  "note": ""
+	"_id": "1",
+	"title": "2010 Honda Accord",
+	"data": [{
+		"ID": "1",
+		"message": "some data",
+		"time": "UTC",
+		"count": 1
+	}],
+	"label": "",
+	"note": ""
 };
 
 // begin creating the port
 SerialPort.Binding = MockBinding;
 // if echo is false, then port.on('data', ...) won't fire
-MockBinding.createPort('PORT_PATH', {
-  echo: true,
-  record: false
-});
+MockBinding.createPort('PORT_PATH', {echo: true, record: false});
 //const port = new SerialPort('/dev/ttyUSB0', { // use instead of the previous line with real car
 const port = new SerialPort('PORT_PATH', { // TESTING port
-  baudRate: 115200,
-  parser: SerialPort.parsers.readline, // need to split messages at each line
-  highWaterMark: 90 // max buffer size of the port
+    baudRate: 115200,
+    parser: SerialPort.parsers.readline,  // need to split messages at each line
+    highWaterMark: 90  										// max buffer size of the port
 });
 
 // create the parser that emits data at the newline (how our messages are delimited)
 const parser = port.pipe(new Readline());
 
 // ReadStream to read from logFile (test only)
-logFile = fs.createReadStream(TEST_LOG_PATH, {
-    highWaterMark: 90
-  } // max size to buffer when reading from the file
+logFile = fs.createReadStream(TEST_LOG_PATH,
+  {highWaterMark: 90} // max size to buffer when reading from the file
 );
 
 /*
@@ -76,7 +72,7 @@ function startReading() {
       let id = dataSplit[2].slice(0, 3);
       let messageData = dataSplit[2].slice(4);
 
-      // make the time stamp human-readable
+      // make the time stamp dhuman-readable
       let unixTimeStamp = dataSplit[0].slice(1, -1);
       let date = new Date(parseFloat(unixTimeStamp));
       let hours = date.getHours();
@@ -88,12 +84,7 @@ function startReading() {
 
       // increment the count of the id if it occurs again
       let messageCount = messages[id] ? messages[id]["count"] : 0;
-      messages[id] = {
-        "id": id,
-        "data": messageData,
-        "timestamp": timeString,
-        "count": ++messageCount
-      };
+      messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
       // create table from JSON data array
       var messageHTML = tableify(messages);
       document.getElementById("table").innerHTML = messageHTML;
@@ -104,7 +95,7 @@ function startReading() {
   port.pipe(parser);
 
   // create the file reader (only for demo purposes)
-  logFile.pipe(port); // send all data to the port
+  logFile.pipe(port);  // send all data to the port
 }
 
 function pauseReading() {
@@ -114,15 +105,13 @@ function pauseReading() {
 
 // onclick for #toggleReadBtn (live_read.html)
 function toggleReadBtnPressed() {
-  if (isReading) { // we are reading, so this block pauses the read
+  if (isReading){  // we are reading, so this block pauses the read
     isReading = false;
-    if (isRecording) {
-      toggleRecordBtnPressed();
-    } // stop writing when we stop reading
+    if (isRecording) {toggleRecordBtnPressed();}  // stop writing when we stop reading
     // when pausing, the button now needs to tell user they can start reading again
     toggleReadBtn.innerHTML = "Resume reading";
     setTimeout(pauseReading, 0);
-  } else { // we are not reading, so we start reading
+  } else {  // we are not reading, so we start reading
     isReading = true;
     // when resuming read, the button now needs to tell user they can pause reading again
     toggleReadBtn.innerHTML = "Pause reading";
@@ -139,9 +128,7 @@ function toggleReadBtnPressed() {
 function setupRecorder() {
   loggingLocation = document.getElementById("logfile-path").value;
   // if the user hasn't entered a file name, generate one by default
-  if (!loggingLocation) {
-    loggingLocation = `logs/CAN_${Date.now()}.log`;
-  }
+  if (!loggingLocation) {loggingLocation = `logs/CAN_${Date.now()}.log`;}
   if (!loggingLocation.endsWith('.log')) {
     loggingLocation = loggingLocation.concat('.log');
   }
@@ -152,9 +139,7 @@ function setupRecorder() {
 // called from toggleRecordBtnPressed
 function startRecording() {
   if (!recordingFileStream) {
-    recordingFileStream = fs.createWriteStream(null, {
-      fd: fd
-    });
+    recordingFileStream = fs.createWriteStream(null, {fd: fd});
     recordingFileStream.on('data', data => {
       fs.writeFile(fd, data);
     });
@@ -170,27 +155,23 @@ function pauseRecording() {
 // takes care of cleaning things up when the user is done recording
 function endRecording() {
   pauseRecording();
-  // prevent memory leak
+	// prevent memory leak
   recordingFileStream.end();
   fs.closeSync(fd);
 }
 
 // onclick for #toggleRecordBtn (live_read.html)
 function toggleRecordBtnPressed() {
-  if (isRecording) { // we are recording, so pause
+	if (isRecording) {  // we are recording, so pause
     isRecording = false;
     toggleRecordBtn.innerHTML = "Resume recording";
-    setTimeout(0, pauseRecording); // TODO: see if this setTimeout is really necessary (doubt it)
-  } else { // we aren't recording, so resume/start recording
-    isRecording = true;
-    toggleRecordBtn.innerHTML = "Pause recording";
-    if (!loggingLocation) {
-      setupRecorder();
-    }
-    // if we are logging we also ought to be reading (right?)
-    if (!isReading) {
-      toggleReadBtnPressed();
-    }
-    startRecording();
+    setTimeout(0, pauseRecording);  // TODO: see if this setTimeout is really necessary (doubt it)
+  } else {  // we aren't recording, so resume/start recording
+      isRecording = true;
+      toggleRecordBtn.innerHTML = "Pause recording";
+      if (!loggingLocation) {setupRecorder();}
+			// if we are logging we also ought to be reading (right?)
+      if (!isReading) {toggleReadBtnPressed();}
+      startRecording();
   }
 }
