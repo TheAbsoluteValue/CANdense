@@ -7,8 +7,9 @@
   <title>Document</title>
 </head>
 <body>
-  <input type="file" onchange="setLogfile()" accept=".log" name="logfile-selector" id="logfile-selector">
-  <label for="logfile-selector">Choose log file to read</label>
+  <input type="text" name="logfile-path" id="logfile-path">
+  <label for="logfile-path">Enter path to log file</label>
+  <button id="set-path-btn">Set path to desired file</button>
 
   <form action="index.html">
     <input type="submit" value="Home">
