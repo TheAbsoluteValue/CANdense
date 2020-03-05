@@ -52,8 +52,9 @@ function readLogFile(path) {
 		let dataSplit = data.toString().split(' ');
 		if (dataSplit[2]) {
 			// get the ID and message data
-			let id = dataSplit[2].slice(0, 3);
-			let content = dataSplit[2].slice(4);
+			const idData = dataSplit[2].split('#');
+			let id = idData[0];
+			let content = idData[1];
 
 			// make the time stamp human-readable
 			let unixTimeStamp = dataSplit[0].slice(1, -1);
