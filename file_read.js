@@ -41,12 +41,20 @@ function readLogFile(path) {
 	let logFileStream = fs.createReadStream(path);
 	// parser will emit data any time a newline occurs
 	const parser = logFileStream.pipe(new Readline());
-	let messageCounts = {}; // counts the number of occurrences of each ID
+	const messageCounts = []; // counts the number of occurrences of each ID
+	// for the header when using tableify
+	// messageCounts.unshift({"ID": "Count"});
 
 	document.getElementById('table-container').style.display = 'block';
 	// the point at which we will append a row for each message
 	const tBody = document.getElementById("table-body");
 
+// when are done reading (and therefore counting), we can create the table that counts the variable
+	logFileStream.on('end', () => {
+		let occurenceTableContainer = document.getElementById('occurrence-table-container');
+		let occurrenceTable = tableify(messageCounts);
+		occurenceTableContainer.innerHTML = occurrenceTable;
+	});
 
 	parser.on('data', data => {
 		let dataSplit = data.toString().split(' ');
@@ -68,9 +76,9 @@ function readLogFile(path) {
 
 			// count number of occurrences of each ID
 			if (messageCounts[id]) {
-				messageCounts[id]++;
+				messageCounts[id]['ID']++;
 			} else {
-				messageCounts[id] = 0;
+				messageCounts[id] = {ID: 0};
 			}
 
 			// add message to the table
