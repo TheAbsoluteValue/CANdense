@@ -3,6 +3,8 @@ const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 
 var selectedPath = '';
+var os;
+var fileOptions;
 var dataJson = {
 	"_id": "1",
 	"title": "2010 Honda Accord",
@@ -20,6 +22,7 @@ var dataJson = {
 run();
 
 function run() {
+	os = getOS();
 	populateSelectFileDropdown();
 	registerFileBtn();
 }
@@ -94,8 +97,12 @@ function readLogFile(path) {
 function populateSelectFileDropdown() {
     // get select ID, for file selection in current directory
     let filePath = document.getElementById('logfile-path');
-    // populate var with current files in directory
-    var fileOptions = fs.readdirSync('./');
+	// populate var with current files in directory based on OS
+	if (os === "Windows") {
+		fileOptions = fs.readdirSync('./');
+	} else {
+		fileOptions = fs.readdirSync(process.cwd());
+	}
     // filter above to only include log files
     var logFiles = fileOptions.filter(file => file.endsWith('.log'));
     // populate select options
@@ -104,11 +111,10 @@ function populateSelectFileDropdown() {
 
 // on file change, return a string of the correct path depending on OS
 function selectionChanged(event) {
-	var os = getOS();
 	if (os === "Windows") {
 		selectedPath = './' + event.target.value;
 	} else {
-		selectedPath = '.\\' + event.target.value;
+		selectedPath = event.target.value;
 	}
 }
 
