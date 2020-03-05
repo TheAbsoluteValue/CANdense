@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="live_read.css">
 <!-- make this drop-down select based on files for different makes? -->
 
 <h3 id="carMake" class="customTitle"></h3><br>
 </head>
 
 <body>
+  <div id = "centerAlign">
 <!-- This button is used to start/pause receiving new messages -->
 <button id="toggleReadBtn" onclick="toggleReadBtnPressed()">Start reading</button>
 <br>
@@ -39,7 +41,7 @@
 
 <div id="error"></div>
 <div id="ports"></div>
-
+  </div>
 </body>
 <script src="./live_read.js"></script>
 </html>
