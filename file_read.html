@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<!-- make this drop-down select based on files for different makes? -->
-<h3 id="carMake" class="customTitle"></h3><br>
+  <!-- make this drop-down select based on files for different makes? -->
+  <h3 id="carMake" class="customTitle"></h3><br>
 </head>
+
 <body>
   <input type="text" name="logfile-path" id="logfile-path">
   <label for="logfile-path">Enter path to log file</label>
@@ -13,14 +15,29 @@
     <input type="submit" value="Home">
   </form>
 
-    <h3 class="customHeader">Number of Messages by ID</h3>
-    <div id="occurenceTable" class="customTable"></div><br><br><br>
+  <h3 class="customHeader">Number of Messages by ID</h3>
+  <div id="occurrence-table-container" class="customTable"></div>
+  <br><br><br>
 
-    <h3 class="customHeader">Messages from CAN</h3>
-    <div id="table" class="customTable"></div>
+  <h3 class="customHeader">Messages from CAN</h3>
+  <div id="table-container" class="customTable" hidden>
+    <table>
+      <thead>
+        <tr>
+          <td class=tableHeader>ID</td>
+          <td class=tableHeader>Content</td>
+          <td class=tableHeader>Time</td>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- to be populated as each message is read -->
+      </tbody>
+    </table>
+  </div>
 
-    <!-- make this user input -->
-    <p id="notes" class="customNotes"></p>
+  <!-- make this user input -->
+  <p id="notes" class="customNotes"></p>
 </body>
 <script src="./file_read.js"></script>
+
 </html>

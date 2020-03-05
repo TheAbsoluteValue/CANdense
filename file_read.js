@@ -31,12 +31,17 @@ function readLogFile(path) {
 	const parser = logFileStream.pipe(new Readline());
 	let messageCounts = {}; // counts the number of occurrences of each ID
 
+	document.getElementById('table-container').style.display = 'block';
+	// the point at which we will append a row for each message
+	const tBody = document.getElementById("table-body");
+
+
 	parser.on('data', data => {
 		let dataSplit = data.toString().split(' ');
 		if (dataSplit[2]) {
 			// get the ID and message data
 			let id = dataSplit[2].slice(0, 3);
-			let messageData = dataSplit[2].slice(4);
+			let content = dataSplit[2].slice(4);
 
 			// make the time stamp human-readable
 			let unixTimeStamp = dataSplit[0].slice(1, -1);
@@ -55,22 +60,21 @@ function readLogFile(path) {
 				messageCounts[id] = 0;
 			}
 
-			// add to the table that
-			let tableBody = document.querySelector('#table table tbody');
-			let newRow = document.createElement("tr");
-			let idElement = document.createElement('td');
-			idElement.className = "string";
-			idElement.textContent = id;
-			let dataElement = document.createElement('td');
-			dataElement.className = "string";
-			dataElement.textContent = messageData;
-			let timeStampElement = document.createElement('td');
-			timeStampElement.className = "string";
-			timeStampElement.textContent = timeString;
-			newRow.appendChild(idElement);
-			newRow.appendChild(dataElement);
-			newRow.appendChild(timeStampElement);
-			tableBody.appendChild(newRow);
+			// add message to the table
+			let newRow = document.createElement('tr');
+			let idTd = document.createElement('td');
+			idTd.className = "string";
+			idTd.textContent = id;
+			let contentTd = document.createElement('td');
+			contentTd.className = "string";
+			contentTd.textContent = content;
+			let timeTd = document.createElement('td');
+			timeTd.className = "string";
+			timeTd.textContent = timeString;
+			newRow.appendChild(idTd);
+			newRow.appendChild(contentTd);
+			newRow.appendChild(timeTd);
+			tBody.appendChild(newRow);
 		}
 	});
 
