@@ -1,5 +1,5 @@
 const tableify = require('tableify');
-const path = './data.json';
+const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 
 var selectedPath = '';

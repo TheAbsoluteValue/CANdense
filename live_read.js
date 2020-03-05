@@ -68,9 +68,10 @@ function startReading() {
     let dataSplit = data.toString().split(' ');
     // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
     if (dataSplit[2]) {
-      // get the ID and message data
-      let id = dataSplit[2].slice(0, 3);
-      let messageData = dataSplit[2].slice(4);
+        // get the ID and message data
+      const idData = dataSplit[2].split('#');
+      let id = idData[0];
+      let messageData = idData[1];
 
       // make the time stamp dhuman-readable
       let unixTimeStamp = dataSplit[0].slice(1, -1);
