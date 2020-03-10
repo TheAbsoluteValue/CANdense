@@ -7,6 +7,20 @@
   <title>Document</title>
 </head>
 <body>
+  <!-- This input will take the ID the user wants to transmit -->
+  <label for="transmit-id">Message ID</label>
+  <input type="text" id="transmit-id" name="transmit-id" maxlength="3"><br>
+  <!-- This input will take the data field of the message -->
+  <label for="transmit-data">Message data</label>
+  <input type="text" id="transmit-data" name="transmit-data" maxlength="16"><br>
+  <!-- This input will take the interval the message will be transmitted -->
+  <label for="transmit-interval">Transmission interval (ms)</label>
+  <input type="number" id="transmit-interval" name="transmit-interval"><br>
+  <!-- This input will take the number of times the messages will be transmitted -->
+  <label for="transmit-count">How many times</label>
+  <input type="number" id="transmit-count" name="transmit-count"><br>
+  <button id='transmit-btn' type="button" name="button">Transmit</button>
+
   <form action="index.html">
     <input type="submit" value="Home">
   </form>
