@@ -28,6 +28,7 @@ document.getElementById('transmit-btn').addEventListener('click', () => {
   } catch(err) {
     // TODO: indicate to user that the ID isn't right
     alert('ID INVALID');
+    return; // to prevent further execution (transmitting of invalid data)
   }
   // the data field for the message that the user wants to transmit (required)
   let data = document.getElementById('transmit-data').value;
@@ -36,6 +37,8 @@ document.getElementById('transmit-btn').addEventListener('click', () => {
   } catch(err) {
     // TODO: indicate to user that the data field isn't right
     alert('DATA INVALID');
+    return; // to prevent further execution (transmitting of invalid data)
+
   }
   // the interval at which the user wants to transmit the message (in ms) (optional, defaults to 1000ms)
   let interval = document.getElementById('transmit-interval').value;
