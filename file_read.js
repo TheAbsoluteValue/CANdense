@@ -27,6 +27,7 @@ function run() {
 	registerFileBtn();
 }
 
+// register read file button click listener
 function registerFileBtn() {
 	document.getElementById('read-btn').addEventListener('click', () => {
 		if (!selectedPath) {
