@@ -14,16 +14,29 @@ const port = new SerialPort('PORT_PATH', {
 
 // returns true if the input is a valid hexadecimal number
 function isValidHex(string) {
-  // TODO: figure out the right regular expression and finish this
-  let re = /[a-f]|[A-F]|[0-9]/;
+  let hex = /^[0-9a-f]+$/i;
+  console.log(hex.test(string));
+  return hex.test(string);
 }
 
 // write to port when button is pushed
 document.getElementById('transmit-btn').addEventListener('click', () => {
   // the ID for the message that the user wants to transmit (required)
   let id = document.getElementById('transmit-id').value;
+  try {
+    if (!isValidHex(id)) {throw "ID is not valid hex";}
+  } catch(err) {
+    // TODO: indicate to user that the ID isn't right
+    alert('ID INVALID');
+  }
   // the data field for the message that the user wants to transmit (required)
   let data = document.getElementById('transmit-data').value;
+  try {
+    if (!isValidHex(data)) {throw "data is not valid hex";}
+  } catch(err) {
+    // TODO: indicate to user that the data field isn't right
+    alert('DATA INVALID');
+  }
   // the interval at which the user wants to transmit the message (in ms) (optional, defaults to 1000ms)
   let interval = document.getElementById('transmit-interval').value;
   if (!interval || interval < 1) {interval = 1000}
@@ -53,7 +66,6 @@ document.getElementById('transmit-btn').addEventListener('click', () => {
   }
 
   setIntervalAndCallImmediately(() => {
-    console.log(`Writing to port: ${transmissionString}`);
     port.write(transmissionString);
   }, interval);
 });
