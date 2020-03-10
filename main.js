@@ -1,5 +1,12 @@
 const { app, BrowserWindow } = require('electron');
 
+/*
+This will be used amongst many different processes (through IPC) and will be set in the settings page of the app. It is used when the user wants to store notes or know ID labels for different
+vehicles. The value can be null without issue, but there will be no way to store or load
+saved ID labels or vehicle notes.
+*/
+let vehicleName = null;
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
