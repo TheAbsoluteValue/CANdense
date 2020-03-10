@@ -1,3 +1,6 @@
+const fs = require('fs');
+let os;
+
 // When the user selects a new vehicle, this event fires
 function selectionChanged(event) {
   let newVehicleName = event.target.value;
@@ -5,7 +8,7 @@ function selectionChanged(event) {
 
 // prepares for user to select item from drop down
 function run() {
-	let os = getOS();
+	os = getOS();
 	populateSelectFileDropdown();
 	registerFileBtn();
 }
@@ -29,14 +32,15 @@ function populateSelectFileDropdown() {
 	// populate var with current files in directory based on OS
   let vehiclesJSON;
 	if (os === "Windows") {
-		vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.config'));
+		vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json'));
 	} else {
-		vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.config'));
+		vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
 	}
-    // keys of vehiclesJSON is the name of the vehicle
-    let vehicleNames = vehiclesJSON.keys();
-    // populate select options
-    vehicleNames.forEach(vehicleName => filePath.options.add(new Option(vehicleName)));
+  console.log(vehiclesJSON);
+  // keys of vehiclesJSON is the name of the vehicle
+  let vehicleNames = Object.keys(vehiclesJSON);
+  // populate select options
+  vehicleNames.forEach(vehicleName => filePath.options.add(new Option(vehicleName)));
 }
 
 document.getElementById('select-vehicle-btn').addEventListener('click', () => {
@@ -65,3 +69,6 @@ addVehicleBtn.addEventListener('click', () => {
   newVehicleInput.insertAdjacentElement('afterend', newVehicleBtn);
   newVehicleInput.insertAdjacentElement('afterend', document.createElement('br'));
 });
+
+
+run();
