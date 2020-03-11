@@ -44,9 +44,8 @@ function readLogFile(path) {
 	const parser = logFileStream.pipe(new Readline());
 	const messageCounts = []; // counts the number of occurrences of each ID
 	// for the header when using tableify
-	// messageCounts.unshift({"ID": "Count"});
+	messageCounts.unshift({"ID": "Count"});
 
-	document.getElementById('table-container').style.display = 'block';
 	// the point at which we will append a row for each message
 	const tBody = document.getElementById("table-body");
 
@@ -99,6 +98,9 @@ function readLogFile(path) {
 			tBody.appendChild(newRow);
 		}
 	});
+
+	// once table is done bulding, show it
+	document.getElementById('table-container').hidden = false;
 }
 
 
