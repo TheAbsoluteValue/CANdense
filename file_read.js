@@ -2,22 +2,8 @@ const tableify = require('tableify');
 const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 
-var selectedPath = '';
-var os;
+let os;
 var fileOptions;
-var dataJson = {
-	"_id": "1",
-	"title": "2010 Honda Accord",
-	"data": [{
-        "ID": "1",
-		"Message": "some data",
-		"Time": "UTC",
-		"Count": 1
-    }],
-    "Count": 1,
-	"label": "",
-	"note": ""
-};
 
 function run() {
 	os = getOS();
@@ -42,18 +28,31 @@ function readLogFile(path) {
 	let logFileStream = fs.createReadStream(path);
 	// parser will emit data any time a newline occurs
 	const parser = logFileStream.pipe(new Readline());
-	const messageCounts = []; // counts the number of occurrences of each ID
-	// for the header when using tableify
-	messageCounts.unshift({"ID": "Count"});
-
+	// ID: count
+	const idCounts = {};
 	// the point at which we will append a row for each message
-	const tBody = document.getElementById("table-body");
+	const messageTBody = document.getElementById("message-table-body");
 
 // when are done reading (and therefore counting), we can create the table that counts the variable
 	logFileStream.on('end', () => {
-		let occurenceTableContainer = document.getElementById('occurrence-table-container');
-		let occurrenceTable = tableify(messageCounts);
-		occurenceTableContainer.innerHTML = occurrenceTable;
+		let occurrenceTableBody = document.getElementById('occurrence-table-body');
+		// array version of the object that has ID: count
+		let idCountEntries = sortOccurrencesArray(Object.entries(idCounts));
+		idCountEntries.forEach(item => {
+			var newRow = document.createElement("tr");
+			var idCol = document.createElement("td");
+			idCol.className = "string";
+			idCol.textContent = item[0];
+			var countCol = document.createElement("td");
+			countCol.className = "string";
+			countCol.textContent = item[1];
+
+			newRow.appendChild(idCol);
+			newRow.appendChild(countCol);
+			occurrenceTableBody.appendChild(newRow);
+		});
+
+		//occurrenceTableContainer.innerHTML = occurrenceTable;
 	});
 
 	parser.on('data', data => {
@@ -75,10 +74,10 @@ function readLogFile(path) {
 			let timeString = [hours, minutes, seconds, milliseconds].join(':');
 
 			// count number of occurrences of each ID
-			if (messageCounts[id]) {
-				messageCounts[id]['ID']++;
+			if (idCounts[id] == 0 || idCounts[id]) {
+				idCounts[id]++;
 			} else {
-				messageCounts[id] = {ID: 0};
+				idCounts[id] = 0;
 			}
 
 			// add message to the table
@@ -95,12 +94,12 @@ function readLogFile(path) {
 			newRow.appendChild(idTd);
 			newRow.appendChild(contentTd);
 			newRow.appendChild(timeTd);
-			tBody.appendChild(newRow);
+			messageTBody.appendChild(newRow);
 		}
 	});
 
 	// once table is done bulding, show it
-	document.getElementById('table-container').hidden = false;
+	document.getElementById('message-table-container').hidden = false;
 }
 
 
@@ -128,22 +127,8 @@ function selectionChanged(event) {
 	}
 }
 
-// sort by ID, then combine like messages within same ID
-function sortById(data) {
-    return data.sort((a, b) => (a.ID > b.ID) ? 1 : -1);
-}
-
-// reduce sortedData object to count the number of occurences of each ID. reduce(accumulator, current_val)
-function countMessagesById(data) {
-    const result = data.reduce(function(msgs, val) {
-        msgs[val.ID] = (msgs[val.ID] || 0) + 1;
-        return msgs;
-     }, {});
-     return result;
-}
-
 // needed this for sorting array of message occurences per ID
-function sortOccurencesArray(arr) {
+function sortOccurrencesArray(arr) {
     return arr.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
 }
 
