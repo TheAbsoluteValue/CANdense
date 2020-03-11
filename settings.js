@@ -1,5 +1,6 @@
 const fs = require('fs');
 let os;
+let vehiclesJSON;
 
 // When the user selects a new vehicle, this event fires
 function selectionChanged(event) {
@@ -10,7 +11,6 @@ function selectionChanged(event) {
 function run() {
 	os = getOS();
 	populateSelectFileDropdown();
-	registerFileBtn();
 }
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
@@ -28,15 +28,21 @@ function getOS() {
 // TODO: Need to create the vehicles.config if DNE and read if it does
 function populateSelectFileDropdown() {
   // get select ID, for file selection in current directory
+  // TODO: rename this variable and HTML ID
   let filePath = document.getElementById('vehicle-profile-path');
 	// populate var with current files in directory based on OS
-  let vehiclesJSON;
 	if (os === "Windows") {
 		vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json'));
 	} else {
 		vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
 	}
-  console.log(vehiclesJSON);
+  /*
+  clear the list of options so that when adding a new vehicle,
+  the old ones don't appear multiple times. Elements need to be removed in reverse orderhttps://stackoverflow.com/questions 3364493/how-do-i-clear-all-options-in-a-dropdown-box
+  */
+  for (i = filePath.options.length - 1; i >= 0; i--) {
+    filePath.options.remove(i);
+  }
   // keys of vehiclesJSON is the name of the vehicle
   let vehicleNames = Object.keys(vehiclesJSON);
   // populate select options
@@ -44,7 +50,7 @@ function populateSelectFileDropdown() {
 }
 
 document.getElementById('select-vehicle-btn').addEventListener('click', () => {
-
+  let JSONdata = JSON.parse()
 });
 
 /*
@@ -68,6 +74,30 @@ addVehicleBtn.addEventListener('click', () => {
   newVehicleInput.insertAdjacentElement("beforebegin", document.createElement('br'));
   newVehicleInput.insertAdjacentElement('afterend', newVehicleBtn);
   newVehicleInput.insertAdjacentElement('afterend', document.createElement('br'));
+
+  // make the new DOM elements useful
+  newVehicleBtn.addEventListener('click', function() {
+    let vehicleName = newVehicleInput.value;
+    if (vehicleName) {  // add the vehicle to JSON file
+      vehiclesJSON[vehicleName] = {
+        vehicleName:
+        {
+          "received_ids": [],
+          "labeled_ids": {},
+          "notes": ""
+        }
+      };
+
+      let newJSONtext = JSON.stringify(vehiclesJSON);
+      let fd = fs.openSync('vehicles.json', 'w');
+      fs.writeSync(fd, Buffer.from(newJSONtext));
+      fs.closeSync(fd);
+      populateSelectFileDropdown();
+    } else {
+      alert("Can not store empty vehicle name");
+    }
+  });
+
 });
 
 
