@@ -7,7 +7,7 @@ let selectedPath;  // the path to the log file the user wants
 
 document.addEventListener('DOMContentLoaded',() => {
 	// sets the currently selected path to the file that the user sees
-	selectedPath = document.getElementById('logfile-path').options[0].value;
+	selectedPath = document.getElementById('logfile-path-dropdown').options[0].value;
 
 	// read the log file, as long as the user has selected a path
 	document.getElementById('read-btn').addEventListener('click', () => {
