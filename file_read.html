@@ -7,8 +7,15 @@
 <h3 id="carMake" class="customTitle"></h3><br>
 </head>
 <body>
+  <!-- DOM elements relevant to selecting vehicle profile -->
+  <label id="vehicle-profile-label">Vehicle</label>
+  <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
+  <button id="add-vehicle-btn">+</button>
+  <br>
+
+  <!-- DOM elements relevant to selecting the log file to read -->
   <label id="logfile-label">Log file path</label>
-  <select type="file" id="logfile-path-dropdown" onChange="selectionChanged(event)">
+  <select type="file" id="logfile-path-dropdown" onChange="logFileSelectionChanged(event)">
   </select>
   <button id="read-btn">Read</button>
 
@@ -16,6 +23,7 @@
     <input type="submit" value="Home">
   </form>
 
+  <!-- table to display counts of each ID -->
   <h3 class="customHeader">Number of Messages by ID</h3>
   <div id="occurrence-table-container" class="customTable">
     <table>
@@ -32,6 +40,7 @@
   </div>
   <br><br><br>
 
+  <!-- table to display all messages from the log file -->
   <h3 class="customHeader">Messages from CAN</h3>
   <div id="message-table-container" class="customTable" hidden>
     <table>

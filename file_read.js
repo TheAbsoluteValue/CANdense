@@ -4,7 +4,10 @@ const fs = require('fs');
 let os = getOS();  // string name of the OS which is used for file loading
 let fileOptions;  // list of the files the user can read in
 let selectedPath;  // the path to the log file the user wants
+let vehiclesJSON;  // vehicles.json parsed as an object
+let vehicleDropdown; // dropdown user can select vehicle profile from
 
+// don't do anything until all DOM element load
 document.addEventListener('DOMContentLoaded',() => {
 	// sets the currently selected path to the file that the user sees
 	selectedPath = document.getElementById('logfile-path-dropdown').options[0].value;
@@ -98,7 +101,7 @@ document.addEventListener('DOMContentLoaded',() => {
 	}
 });
 
-// puts list of files the user can display in the drop down
+// puts list of log files the user can display in the drop down
 function populateSelectFileDropdown() {
     // get select ID, for file selection in current directory
     let filePathSelector = document.getElementById('logfile-path-dropdown');
@@ -115,7 +118,7 @@ function populateSelectFileDropdown() {
 }
 
 // on file change, return a string of the correct path depending on OS
-function selectionChanged(event) {
+function logFileSelectionChanged(event) {
 	if (os === "Windows") {
 		selectedPath = './' + event.target.value;
 	} else {
@@ -128,6 +131,95 @@ function sortOccurrencesArray(arr) {
     return arr.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
 }
 
+// When the user selects a new vehicle, this event fires
+function vehicleSelectionChanged(event) {
+  let newVehicleName = event.target.value;
+	populateVehicleProfileDropdown();
+}
+
+// retrieves the stored vehicle names and adds them to this list
+// TODO: Need to create the vehicles.config if DNE and read if it does
+function populateVehicleProfileDropdown() {
+  // get select ID, for file selection in current directory
+  vehicleDropdown = document.getElementById('vehicle-profile-name');
+
+	// populate var with current files in directory based on OS
+	if (os === "Windows") {
+		vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json'));
+	} else {
+		vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
+	}
+
+  /*
+  clear the list of options so that when adding a new vehicle,
+  the old ones don't appear multiple times. This is useful when this
+	method is called from vehicleSelectionChanged. Elements need to be
+	removed in reverse order
+	https://stackoverflow.com/questions 3364493/how-do-i-clear-all-options-in-a-dropdown-box
+  */
+  for (i = vehicleDropdown.options.length - 1; i >= 0; i--) {
+    vehicleDropdown.options.remove(i);
+  }
+  // keys of vehiclesJSON is the name of the vehicle
+  let vehicleNames = Object.keys(vehiclesJSON);
+  // populate select options
+  vehicleNames.forEach(vehicleName => vehicleDropdown.options.add(new Option(vehicleName)));
+}
+
+/*
+Allows user to add a vehicle to the list of vehicles. Also adds that vehicle to the
+vehicles.config JSON file.
+TODO (maybe): Just put all the new inputs and buttons in the HTML from the beginning,
+but just hide them and then unhide them when the user clicks the + button.
+TODO: Hide the input and button again after the user adds the vehicle.
+*/
+let addVehicleBtn = document.getElementById('add-vehicle-btn');
+addVehicleBtn.addEventListener('click', () => {
+  // create the DOM objects
+  let newVehicleInput = document.createElement("input");
+  newVehicleInput.setAttribute("id", "new-vehicle-input");
+  let newVehicleBtn = document.createElement("button");
+  newVehicleBtn.innerHTML = "Save vehicle";
+  newVehicleBtn.setAttribute("id", "new-vehicle-btn");
+
+  // add the new object to the DOM
+  addVehicleBtn.insertAdjacentElement('afterend', newVehicleInput);
+  //newVehicleInput.insertAdjacentElement("beforebegin", document.createElement('br'));
+  newVehicleInput.insertAdjacentElement('afterend', newVehicleBtn);
+  //newVehicleInput.insertAdjacentElement('afterend', document.createElement('br'));
+
+  // make the new DOM elements useful
+  newVehicleBtn.addEventListener('click', function() {
+    let vehicleName = newVehicleInput.value;
+    if (vehicleName) {  // add the vehicle to JSON file
+      vehiclesJSON[vehicleName] = {
+        vehicleName:
+        {
+          "received_ids": [],
+          "labeled_ids": {},
+          "notes": ""
+        }
+      };
+
+      let newJSONtext = JSON.stringify(vehiclesJSON);
+      let fd = fs.openSync('vehicles.json', 'w');
+      fs.writeSync(fd, Buffer.from(newJSONtext));
+      fs.closeSync(fd);
+			// update the dropdown to include the new vehicle
+      populateVehicleProfileDropdown();
+			// make the newly added vehicle the selected one
+			vehicleDropdown.options[vehicleDropdown.options.length - 1].selected = true;
+
+			// remove button to save the vehicle and the name input
+			newVehicleInput.parentNode.removeChild(newVehicleInput);
+			newVehicleBtn.parentNode.removeChild(newVehicleBtn);
+    } else {
+      alert("Can not store empty vehicle name");
+    }
+  });
+
+});
+
 // use navigator to figure out which OS you are on, useful for file directory stuff
 function getOS() {
 	if (navigator.appVersion.indexOf("Win") != -1) {
@@ -139,4 +231,5 @@ function getOS() {
 	}
 }
 
+populateVehicleProfileDropdown();
 populateSelectFileDropdown();

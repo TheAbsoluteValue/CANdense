@@ -21,19 +21,6 @@ let isRecording = false; // wheter we are logging data or not
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleRecordBtn = document.getElementById('toggleRecordBtn');
 
-var dataJson = {
-	"_id": "1",
-	"title": "2010 Honda Accord",
-	"data": [{
-		"ID": "1",
-		"message": "some data",
-		"time": "UTC",
-		"count": 1
-	}],
-	"label": "",
-	"note": ""
-};
-
 // begin creating the port
 SerialPort.Binding = MockBinding;
 // if echo is false, then port.on('data', ...) won't fire
