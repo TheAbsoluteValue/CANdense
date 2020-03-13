@@ -1,8 +1,1 @@
-{
-  "2007 Jeep Wrangler":
-    {
-      "received_ids": ["32", "57", "64A"],
-      "labeled_ids": {"32": "Engine RPM", "64A": "Speed"},
-      "notes": "This car burns too much gas"
-    }
-}
+{"None":{"received_ids":[],"labeled_ids":{},"notes":""},"2007 Jeep Wrangler":{"vehicleName":{"received_ids":[],"labeled_ids":{},"notes":""}}}

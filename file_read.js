@@ -6,11 +6,15 @@ let fileOptions;  // list of the files the user can read in
 let selectedPath;  // the path to the log file the user wants
 let vehiclesJSON;  // vehicles.json parsed as an object
 let vehicleDropdown; // dropdown user can select vehicle profile from
+// TODO: add this as first option in vehicle dropdown
+let selectedVehicle = "None";  // name of the vehicle the user has selected
 
 // don't do anything until all DOM element load
-document.addEventListener('DOMContentLoaded',() => {
+document.addEventListener('DOMContentLoaded', () => {
 	// sets the currently selected path to the file that the user sees
 	selectedPath = document.getElementById('logfile-path-dropdown').options[0].value;
+	// get the ID labels (if they're available for the vehicle)
+
 
 	// read the log file, as long as the user has selected a path
 	document.getElementById('read-btn').addEventListener('click', () => {
@@ -29,6 +33,7 @@ document.addEventListener('DOMContentLoaded',() => {
 		const idCounts = {};
 		// the point at which we will append a row for each message
 		const messageTBody = document.getElementById("message-table-body");
+
 
 	// when are done reading (and therefore counting), we can create the table that counts the variable
 		logFileStream.on('end', () => {
@@ -131,9 +136,11 @@ function sortOccurrencesArray(arr) {
     return arr.sort((a, b) => (a[0] > b[0]) ? 1 : -1);
 }
 
+/* Vehicle Profile Selection */
+
 // When the user selects a new vehicle, this event fires
 function vehicleSelectionChanged(event) {
-  let newVehicleName = event.target.value;
+  selectedVehicle = event.target.value;
 	populateVehicleProfileDropdown();
 }
 
@@ -145,9 +152,40 @@ function populateVehicleProfileDropdown() {
 
 	// populate var with current files in directory based on OS
 	if (os === "Windows") {
-		vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json'));
-	} else {
-		vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
+		try { // using 'r+' flag will throw exception when file doesn't exist
+			// r+ flag means reading/writing
+			vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json', 'r+'));
+		} catch(e) { // file doesn't exist, so create it (and add "None" vehicle option)
+			// a+ open the file for reading/appending, creates file if does not exist
+			let newFile = fs.openSync('./vehicles.json', 'a+');
+			vehiclesJSON = {
+				"None":
+				{
+					"received_ids": [],
+					"labeled_ids": {},
+					"notes": ""
+				}
+			};
+			fs.writeSync(newFile, JSON.stringify(vehiclesJSON));
+			fs.closeSync(newFile);
+		}
+	} else {  // MacOS/Linux
+		// all comments from the os === "Windows" case apply here
+		try {
+			vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
+		} catch(e) {
+			let newFile = fs.openSync(process.cwd() + '/vehicles.json', 'a+');
+			vehiclesJSON = {
+				"None":
+				{
+					"received_ids": [],
+					"labeled_ids": {},
+					"notes": ""
+				}
+			};
+			fs.writeSync(newFile, JSON.stringify(vehiclesJSON));
+			fs.closeSync(newFile);
+		}
 	}
 
   /*
@@ -163,7 +201,7 @@ function populateVehicleProfileDropdown() {
   // keys of vehiclesJSON is the name of the vehicle
   let vehicleNames = Object.keys(vehiclesJSON);
   // populate select options
-  vehicleNames.forEach(vehicleName => vehicleDropdown.options.add(new Option(vehicleName)));
+  vehicleNames.forEach(name => vehicleDropdown.options.add(new Option(name)));
 }
 
 /*
