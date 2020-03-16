@@ -8,13 +8,13 @@ let vehiclesJSON;  // vehicles.json parsed as an object
 let vehicleDropdown; // dropdown user can select vehicle profile from
 // TODO: add this as first option in vehicle dropdown
 let selectedVehicle = "None";  // name of the vehicle the user has selected
+let labeledIDs = {};  // object holding labeled IDs
+
 
 // don't do anything until all DOM element load
 document.addEventListener('DOMContentLoaded', () => {
 	// sets the currently selected path to the file that the user sees
 	selectedPath = document.getElementById('logfile-path-dropdown').options[0].value;
-	// get the ID labels (if they're available for the vehicle)
-
 
 	// read the log file, as long as the user has selected a path
 	document.getElementById('read-btn').addEventListener('click', () => {
@@ -33,15 +33,22 @@ document.addEventListener('DOMContentLoaded', () => {
 		const idCounts = {};
 		// the point at which we will append a row for each message
 		const messageTBody = document.getElementById("message-table-body");
+		labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+		// TODO: write this to the vehicles.json file
 
-
-	// when are done reading (and therefore counting), we can create the table that counts the variable
+		// when are done reading (and therefore counting), we can create the table that counts the variable
 		logFileStream.on('end', () => {
 			let occurrenceTableBody = document.getElementById('occurrence-table-body');
 			// array version of the object that has ID: count
 			let idCountEntries = sortOccurrencesArray(Object.entries(idCounts));
 			idCountEntries.forEach(item => {
-				var newRow = document.createElement("tr");
+				let newRow = document.createElement("tr");
+				// this allows this ID's label to be changed from updateCountTable
+				/* PROBLEM:
+						For some reason, all IDs are 0
+				*/
+				let id = Object.keys(Object.keys(item)[0])[0]; // there is only 1 key in item
+				newRow.setAttribute("id", id);
 				let idTd = document.createElement("td");
 				idTd.className = "string";
 				idTd.textContent = item[0];
@@ -257,6 +264,41 @@ addVehicleBtn.addEventListener('click', () => {
   });
 
 });
+
+// add a label to IDs
+let idInput = document.getElementById('id-input');
+let labelInput = document.getElementById('label-input');
+document.getElementById('add-label-btn').addEventListener('click', () => {
+	if (selectedVehicle !== "None" && selectedVehicle) {
+		let id = idInput.textContent;
+		let label = labelInput.textContent;
+		if (!id || !label) {
+			alert('Must enter ID and label');
+			return; // error; nothing more should happen
+		}
+
+		vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+		// TODO: need to update the tables
+	} else {
+		alert("Please select a vehicle to add ID label to")
+	}
+});
+
+// when a label is updated, show this change in the message table
+function updateMessageTable(updateID, newLabel) {
+	messageTBody.getElementsByClassName(updateId).forEach(tableRow => {
+		return;
+	});
+	// find ALL rows whose class
+}
+
+// when a label is updated, change massage counts table
+const occurenceTableBody = document.getElementById('occurrence-table-body');
+function updateCountTable(updateId, newLabel) {
+	let newRow = document.getElementById(updateID, newLabel);
+	newRow.innerHTML = newLabel;
+}
+
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
 function getOS() {
