@@ -47,9 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 				// this allows this ID's label to be changed from updateCountTable
 				let id = item[0];
 				newRow.setAttribute("id", id);
+				if (selectedVehicle !== "None" && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
+					id = vehiclesJSON[selectedVehicle].labeled_ids[id];
+				}
 				let idTd = document.createElement("td");
 				idTd.className = "string";
-				idTd.textContent = item[0];
+				idTd.textContent = id;
 				let countTd = document.createElement("td");
 				countTd.className = "string";
 				countTd.textContent = item[1];
@@ -272,6 +275,7 @@ let labelInput = document.getElementById('label-input');
 document.getElementById('add-label-btn').addEventListener('click', () => {
 	if (selectedVehicle !== "None" && selectedVehicle) {
 		let id = idInput.value;  // string
+		let idInt = parseInt(id);
 		let label = labelInput.value;
 		if (!id || !label) {
 			alert('Must enter ID and label');
@@ -280,10 +284,10 @@ document.getElementById('add-label-btn').addEventListener('click', () => {
 		// add the label to vehicles.json
 		let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
 		if (labeledIdObject == undefined) {
-			vehiclesJSON[selectedVehicle].labeled_ids = {id: label};
+			vehiclesJSON[selectedVehicle].labeled_ids = {idInt: label};
 			alert("This one");
 		} else {
-			vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+			vehiclesJSON[selectedVehicle].labeled_ids[idInt] = label;
 			alert("That one");
 		}
 		let jsonString = JSON.stringify(vehiclesJSON);
@@ -310,7 +314,7 @@ function updateMessageTable(updateID, newLabel) {
 // when a label is updated, change massage counts table
 const occurenceTableBody = document.getElementById('occurrence-table-body');
 function updateCountTable(updateID, newLabel) {
-	let updateRow = document.getElementById(updateID);
+	let updateRow = document.getElementById(updateID.toString());
 	updateRow.firstChild.innerHTML = newLabel;
 }
 
