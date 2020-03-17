@@ -1,10 +1,24 @@
+#customHeader {
+    padding-top: 5px;
+    padding-bottom: 15px;
+    text-align: center;
+    color: white;
+    font-size: 30px;
+}
+
 body {
     background: #2B60DE;
 }
+
 #centerAlign {
+    text-align: center;
+}
+
+#transmitBody {
     align-self: center;
     margin: auto;
     width: 700px;
+    padding-top: 20px !important;
     padding: 100px;
 }
 
@@ -12,4 +26,13 @@ label {
     display: inline-block;
     width: 200px;
     text-align: -webkit-auto;
-  }​
+}
+
+.navbar-link {
+    color: white;
+}
+
+#navbar-rule {
+  border: 2.5px solid white;
+  border-radius: 1px;
+}

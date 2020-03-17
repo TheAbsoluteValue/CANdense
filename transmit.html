@@ -3,10 +3,29 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="transmit.css">
-  <title>Document</title>
+  <h3 id="customHeader">CanDense</h3>
 </head>
 <body>
-  <div id= "centerAlign">
+  <div id="centerAlign">
+		<nav id="navbar">
+			<ul class="list-inline">
+				<li class="list-inline-item">
+					<a href="live_read.html" class="navbar-link">Live Read</a>
+				</li>
+				<li class="list-inline-item">
+					<a href="file_read.html" class="navbar-link">File Read</a>
+				</li>
+				<li class="list-inline-item">
+					<a href="transmit.html" class="navbar-link">Transmit</a>
+				</li>
+				<li class="list-inline-item">
+					<a href="settings.html" class="navbar-link">Settings</a>
+				</li>
+			</ul>
+		</nav>
+    <hr id="navbar-rule">
+  </div>
+  <div id="transmitBody">
   <!-- This input will take the ID the user wants to transmit -->
   <label for="transmit-id">Message ID</label>
   <input type="text" id="transmit-id" name="transmit-id" maxlength="3"><br>
@@ -28,7 +47,7 @@
   <form action="index.html">
     <input type="submit" value="Home">
   </form>
-  </div>
+</div>
 </body>
 <script src="./transmit.js"></script>
 </html>

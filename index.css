@@ -16,7 +16,16 @@ body {
     text-align: center;
 }
 
-.IndexBtn {
+.navbar-link {
+    color: white;
+}
+
+#navbar-rule {
+  border: 2.5px solid white;
+  border-radius: 1px;
+}
+
+/* .IndexBtn {
     display: inline-block;
     padding: 10px;
-}
+} */

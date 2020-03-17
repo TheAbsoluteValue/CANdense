@@ -1,6 +1,23 @@
+#customHeader {
+    padding-top: 5px;
+    padding-bottom: 15px;
+    text-align: center;
+    color: white;
+    font-size: 30px;
+}
+
 body {
     background: #2B60DE;
 }
 #centerAlign {
     text-align: center;
+}
+
+.navbar-link {
+    color: white;
+}
+
+#navbar-rule {
+  border: 2.5px solid white;
+  border-radius: 1px;
 }

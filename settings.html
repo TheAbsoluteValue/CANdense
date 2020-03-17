@@ -2,18 +2,42 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <title>Document</title>
+  <link rel="stylesheet" href="settings.css">
+  <h3 id="customHeader">CanDense</h3>
 </head>
 <body>
-  <label id="vehicle-profile-label">Vehicle</label>
-  <select type="file" id="vehicle-profile-path" onChange="selectionChanged(event)">
-  </select>
-  <button id="select-vehicle-btn">Select vehicle</button>
-  <button id="add-vehicle-btn">+</button>
+  <div id="centerAlign">
+		<nav id="navbar">
+			<ul class="list-inline">
+				<li class="list-inline-item">
+					<a href="live_read.html" class="navbar-link">Live Read</a>
+				</li>
+				<li class="list-inline-item">
+					<a href="file_read.html" class="navbar-link">File Read</a>
+				</li>
+				<li class="list-inline-item">
+					<a href="transmit.html" class="navbar-link">Transmit</a>
+				</li>
+				<li class="list-inline-item">
+					<a href="settings.html" class="navbar-link">Settings</a>
+				</li>
+			</ul>
+		</nav>
+		<hr id="navbar-rule">
+  </div>
+  <div id="settingsBody">
+    
+    <label id="vehicle-profile-label">Vehicle</label>
+    <select type="file" id="vehicle-profile-path" onChange="selectionChanged(event)">
+    </select>
+    <button id="select-vehicle-btn">Select vehicle</button>
+    <button id="add-vehicle-btn">+</button>
+  
 
-  <form action="index.html">
+    <form action="index.html">
     <input type="submit" value="Home">
   </form>
+  </div>
 </body>
 <script src="./settings.js"></script>
 </html>
