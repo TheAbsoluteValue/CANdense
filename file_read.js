@@ -301,7 +301,7 @@ document.getElementById('add-label-btn').addEventListener('click', () => {
 function updateMessageTable(updateID, newLabel) {
 	let rowArray = Array.from(messageTBody.getElementsByClassName(updateID));
 	rowArray.forEach(tableRow => {
-		tableRow.firstChild.innerHTML = newLabel;
+		tableRow.innerHTML = newLabel;
 	});
 }
 
