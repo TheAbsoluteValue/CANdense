@@ -47,7 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				// this allows this ID's label to be changed from updateCountTable
 				let id = item[0];
 				newRow.setAttribute("id", id);
-				if (selectedVehicle !== "None" && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
+				let labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
+				if (selectedVehicle !== "None" && labelsExist && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
 					id = vehiclesJSON[selectedVehicle].labeled_ids[id];
 				}
 				let idTd = document.createElement("td");
@@ -94,6 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				let newRow = document.createElement('tr');
 				let idTd = document.createElement('td');
 				idTd.className = `string ${id}`;
+				let labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
+				if (selectedVehicle !== "None" && labelsExist && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
+					id = vehiclesJSON[selectedVehicle].labeled_ids[id];
+				}
 				idTd.textContent = id;
 				let contentTd = document.createElement('td');
 				contentTd.className = "string";
