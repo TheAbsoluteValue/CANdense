@@ -272,28 +272,30 @@ let labelInput = document.getElementById('label-input');
 document.getElementById('add-label-btn').addEventListener('click', () => {
 	if (selectedVehicle !== "None" && selectedVehicle) {
 		let id = idInput.value;  // string
-		let idAsNumber = parseInt(id);
 		let label = labelInput.value;
-		if (!idAsNumber || !label) {
-			console.log(`${idAsNumber}#${label}`);
+		if (!id || !label) {
 			alert('Must enter ID and label');
 			return; // error; nothing more should happen
 		}
 		// add the label to vehicles.json
 		let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
 		if (labeledIdObject == undefined) {
-			labeledIdObject = {idAsNumber: label};
+			vehiclesJSON[selectedVehicle].labeled_ids = {id: label};
+			alert("This one");
 		} else {
-			labeledIdObject[idAsNumber] = label;
+			vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+			alert("That one");
 		}
-		jsonString = JSON.stringify(vehiclesJSON);
-		fs.writeSync(fs.openSync("vehicles.json", 'w'), jsonString);
+		let jsonString = JSON.stringify(vehiclesJSON);
+		console.log(jsonString);
+		let fd = fs.openSync('vehicles.json', 'w');
+		fs.writeSync(fd, jsonString);
 
 		// update the count and message tables to reflect the new labels
 		updateMessageTable(id, label);
 		updateCountTable(id, label);
 	} else {
-		alert("Please select a vehicle to add ID label to")
+		alert("Please select a vehicle to add ID label to");
 	}
 });
 
