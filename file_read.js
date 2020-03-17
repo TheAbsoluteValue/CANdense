@@ -280,7 +280,6 @@ let labelInput = document.getElementById('label-input');
 document.getElementById('add-label-btn').addEventListener('click', () => {
 	if (selectedVehicle !== "None" && selectedVehicle) {
 		let id = idInput.value;  // string
-		let idInt = parseInt(id);
 		let label = labelInput.value;
 		if (!id || !label) {
 			alert('Must enter ID and label');
@@ -289,10 +288,10 @@ document.getElementById('add-label-btn').addEventListener('click', () => {
 		// add the label to vehicles.json
 		let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
 		if (labeledIdObject == undefined) {
-			vehiclesJSON[selectedVehicle].labeled_ids = {idInt: label};
+			vehiclesJSON[selectedVehicle].labeled_ids = {id: label};
 			alert("This one");
 		} else {
-			vehiclesJSON[selectedVehicle].labeled_ids[idInt] = label;
+			vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
 			alert("That one");
 		}
 		let jsonString = JSON.stringify(vehiclesJSON);
