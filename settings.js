@@ -1,16 +1,12 @@
 const fs = require('fs');
-let os;
+let os = getOS();
 let vehiclesJSON;
 
-// When the user selects a new vehicle, this event fires
-function selectionChanged(event) {
-  let newVehicleName = event.target.value;
-}
+// ADDING THE VEHICLE PROFILE SELECTION
 
-// prepares for user to select item from drop down
-function run() {
-	os = getOS();
-	populateSelectFileDropdown();
+// When the user selects a new vehicle, this event fires
+function vehicleSelectionChanged(event) {
+  let newVehicleName = event.target.value;
 }
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
@@ -26,11 +22,11 @@ function getOS() {
 
 // retrieves the stored vehicle names and adds them to this list
 // TODO: Need to create the vehicles.config if DNE and read if it does
-function populateSelectFileDropdown() {
+function populateVehicleProfileDropdown() {
   // get select ID, for file selection in current directory
   // TODO: rename this variable and HTML ID
-  let filePath = document.getElementById('vehicle-profile-path');
-	// populate var with current files in directory based on OS
+  let filePath = document.getElementById('vehicle-profile-name');
+	// create object from vehicles.JSON
 	if (os === "Windows") {
 		vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json'));
 	} else {
@@ -48,10 +44,6 @@ function populateSelectFileDropdown() {
   // populate select options
   vehicleNames.forEach(vehicleName => filePath.options.add(new Option(vehicleName)));
 }
-
-document.getElementById('select-vehicle-btn').addEventListener('click', () => {
-  let JSONdata = JSON.parse()
-});
 
 /*
 Allows user to add a vehicle to the list of vehicles. Also adds that vehicle to the
@@ -92,7 +84,7 @@ addVehicleBtn.addEventListener('click', () => {
       let fd = fs.openSync('vehicles.json', 'w');
       fs.writeSync(fd, Buffer.from(newJSONtext));
       fs.closeSync(fd);
-      populateSelectFileDropdown();
+      populateVehicleProfileDropdown();
     } else {
       alert("Can not store empty vehicle name");
     }
@@ -100,5 +92,4 @@ addVehicleBtn.addEventListener('click', () => {
 
 });
 
-
-run();
+populateVehicleProfileDropdown();
