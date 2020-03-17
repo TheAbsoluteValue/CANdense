@@ -1,6 +1,9 @@
 const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 
+// the point at which we will append a row for each message
+const messageTBody = document.getElementById("message-table-body");
+
 let os = getOS();  // string name of the OS which is used for file loading
 let fileOptions;  // list of the files the user can read in
 let selectedPath;  // the path to the log file the user wants
@@ -31,8 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		const parser = logFileStream.pipe(new Readline());
 		// ID: count
 		const idCounts = {};
-		// the point at which we will append a row for each message
-		const messageTBody = document.getElementById("message-table-body");
 		labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
 		// TODO: write this to the vehicles.json file
 
@@ -44,10 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			idCountEntries.forEach(item => {
 				let newRow = document.createElement("tr");
 				// this allows this ID's label to be changed from updateCountTable
-				/* PROBLEM:
-						For some reason, all IDs are 0
-				*/
-				let id = Object.keys(Object.keys(item)[0])[0]; // there is only 1 key in item
+				let id = item[0];
 				newRow.setAttribute("id", id);
 				let idTd = document.createElement("td");
 				idTd.className = "string";
@@ -60,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				newRow.appendChild(countTd);
 				occurrenceTableBody.appendChild(newRow);
 			});
-
 		});
 
 		// this handles reading the file and constructing the necessary data structures
@@ -93,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				// add message to the table (doesn't show until ALL messages are added)
 				let newRow = document.createElement('tr');
 				let idTd = document.createElement('td');
-				idTd.className = "string";
+				idTd.className = `string ${id}`;
 				idTd.textContent = id;
 				let contentTd = document.createElement('td');
 				contentTd.className = "string";
@@ -149,6 +146,7 @@ function sortOccurrencesArray(arr) {
 function vehicleSelectionChanged(event) {
   selectedVehicle = event.target.value;
 	populateVehicleProfileDropdown();
+
 }
 
 // retrieves the stored vehicle names and adds them to this list
@@ -156,7 +154,8 @@ function vehicleSelectionChanged(event) {
 function populateVehicleProfileDropdown() {
   // get select ID, for file selection in current directory
   vehicleDropdown = document.getElementById('vehicle-profile-name');
-
+	let selected = vehicleDropdown.selectedIndex;
+	if (selected == -1) {selected = 0};
 	// populate var with current files in directory based on OS
 	if (os === "Windows") {
 		try { // using 'r+' flag will throw exception when file doesn't exist
@@ -209,6 +208,8 @@ function populateVehicleProfileDropdown() {
   let vehicleNames = Object.keys(vehiclesJSON);
   // populate select options
   vehicleNames.forEach(name => vehicleDropdown.options.add(new Option(name)));
+	// reselect the selected element since everything was previous removed
+	vehicleDropdown.selectedIndex = selected;
 }
 
 /*
@@ -270,15 +271,27 @@ let idInput = document.getElementById('id-input');
 let labelInput = document.getElementById('label-input');
 document.getElementById('add-label-btn').addEventListener('click', () => {
 	if (selectedVehicle !== "None" && selectedVehicle) {
-		let id = idInput.textContent;
-		let label = labelInput.textContent;
-		if (!id || !label) {
+		let id = idInput.value;  // string
+		let idAsNumber = parseInt(id);
+		let label = labelInput.value;
+		if (!idAsNumber || !label) {
+			console.log(`${idAsNumber}#${label}`);
 			alert('Must enter ID and label');
 			return; // error; nothing more should happen
 		}
+		// add the label to vehicles.json
+		let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
+		if (labeledIdObject == undefined) {
+			labeledIdObject = {idAsNumber: label};
+		} else {
+			labeledIdObject[idAsNumber] = label;
+		}
+		jsonString = JSON.stringify(vehiclesJSON);
+		fs.writeSync(fs.openSync("vehicles.json", 'w'), jsonString);
 
-		vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
-		// TODO: need to update the tables
+		// update the count and message tables to reflect the new labels
+		updateMessageTable(id, label);
+		updateCountTable(id, label);
 	} else {
 		alert("Please select a vehicle to add ID label to")
 	}
@@ -286,17 +299,17 @@ document.getElementById('add-label-btn').addEventListener('click', () => {
 
 // when a label is updated, show this change in the message table
 function updateMessageTable(updateID, newLabel) {
-	messageTBody.getElementsByClassName(updateId).forEach(tableRow => {
-		return;
+	let rowArray = Array.from(messageTBody.getElementsByClassName(updateID));
+	rowArray.forEach(tableRow => {
+		tableRow.firstChild.innerHTML = newLabel;
 	});
-	// find ALL rows whose class
 }
 
 // when a label is updated, change massage counts table
 const occurenceTableBody = document.getElementById('occurrence-table-body');
-function updateCountTable(updateId, newLabel) {
-	let newRow = document.getElementById(updateID, newLabel);
-	newRow.innerHTML = newLabel;
+function updateCountTable(updateID, newLabel) {
+	let updateRow = document.getElementById(updateID);
+	updateRow.firstChild.innerHTML = newLabel;
 }
 
 
