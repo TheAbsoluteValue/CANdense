@@ -2,7 +2,8 @@ const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 
 // the point at which we will append a row for each message
-const messageTBody = document.getElementById("message-table-body");
+const messageTableBody = document.getElementById("message-table-body");
+let countTableBody;
 
 let os = getOS(); // string name of the OS which is used for file loading
 let fileOptions; // list of the files the user can read in
@@ -120,34 +121,18 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Please select a vehicle to add ID label to");
     }
   });
-
-  // when a label is updated, show this change in the message table
-  function updateMessageTable(updateID, newLabel) {
-    let rowArray = Array.from(messageTBody.getElementsByClassName(updateID));
-    rowArray.forEach(tableRowId => {
-      tableRowId.innerHTML = newLabel;
-    });
-  }
-
-  // when a label is updated, change massage counts table
-  const countTableBody = document.getElementById('count-table-body');
-  function updateCountTable(updateID, newLabel) {
-    let updateRow = document.getElementById(updateID.toString());
-    updateRow.firstChild.innerHTML = newLabel;
-  }
 });
 
 // creates the table to show user how many times messages of each ID occurred
 function createCountTable(idCounts) {
   {
     labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
-    let countTableBody = document.getElementById('count-table-body');
+    countTableBody = document.getElementById('count-table-body');
     // array version of the object that has ID: count
     let idCountEntries = sortCountArray(Object.entries(idCounts));
     idCountEntries.forEach(item => {
       let newRow = document.createElement("tr");
       let id = item[0];
-      newRow.setAttribute("id", id); // ID is used to add label
 
       // check whether labels exist for the given vehicle
       let labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
@@ -160,6 +145,7 @@ function createCountTable(idCounts) {
       let idTd = document.createElement("td"); // holds the ID or label
       idTd.className = "string";
       idTd.textContent = id;
+      idTd.setAttribute("id", id);
       let countTd = document.createElement("td");
       countTd.className = "string";
       countTd.textContent = item[1];
@@ -220,7 +206,7 @@ function createMessageTable(data) {
   newRow.appendChild(idTd);
   newRow.appendChild(contentTd);
   newRow.appendChild(timeTd);
-  messageTBody.appendChild(newRow);
+  messageTableBody.appendChild(newRow);
 }
 
 // reads the log file containing all messages
@@ -338,28 +324,52 @@ function sortCountArray(arr) {
 
 // When the user selects a new vehicle, this event fires
 function vehicleSelectionChanged(event) {
-  if (selectedVehicle !== "None" && selectedVehicle) {
-    clearIdLabels();  // different vehicle, labels are different
-  } else {
-
-  }
+  clearIdLabels();  // different vehicle, labels are different
   selectedVehicle = event.target.value;
-  populateVehicleProfileDropdown();
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  if (tablesDrawn) {
+    massTableUpdate();
+  }
+  populateVehicleProfileDropdown();
 }
 
-// clears the labels from the table without redrawing the whole table
+// clears the labels from both tables without recreating the whole table
 function clearIdLabels() {
   // we know all IDs that have been changed, so just reset the innerHTML of each row
   if (tablesDrawn) {
     Object.keys(labeledIDs).forEach(id => {
-      document.getElementById(id).firstChild.innerHTML = id;
+      document.getElementById(id).innerHTML = id;
       Array.from(document.getElementsByClassName(id)).forEach(rowId => {
         rowId.innerHTML = id;
       });
     });
   }
   labeledIDs = {};
+}
+
+// adds a label to the row with the count of the given ID
+// only changes for a single id, massTableUpdate handles for ALL labeled IDs
+function updateCountTable(updateID, newLabel) {
+  alert(updateID);
+  let updateTd = document.getElementById(updateID.toString());
+  updateTd.innerHTML = newLabel;
+}
+
+// adds a label for each row in the table with the given ID
+// only changes for a single id, massTableUpdate handles for ALL labeled IDs
+function updateMessageTable(updateID, newLabel) {
+  let rowArray = Array.from(messageTableBody.getElementsByClassName(updateID));
+  rowArray.forEach(tableRowId => {
+    tableRowId.innerHTML = newLabel;
+  });
+}
+
+// used when changing vehicles; updates both tables with the new vehicle's labels
+function massTableUpdate() {
+  Object.entries(labeledIDs).forEach(entry => {
+    updateCountTable(entry[0], entry[1]);
+    updateMessageTable(entry[0], entry[1]);
+  });
 }
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
