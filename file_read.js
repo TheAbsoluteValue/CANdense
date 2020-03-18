@@ -13,6 +13,7 @@ let vehicleDropdown; // dropdown user can select vehicle profile from
 let selectedVehicle = "None"; // name of the vehicle the user has selected
 let labeledIDs = {}; // object holding labeled IDs
 const idCounts = {}; // the count of each message (used in count table)
+let tablesDrawn = false;  // whether both tables are drawn
 
 
 // don't do anything until all DOM element load
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
           populateVehicleProfileDropdown();
           // make the newly added vehicle the selected one
           vehicleDropdown.options[vehicleDropdown.options.length - 1].selected = true;
+					selectedVehicle = vehicleName;
 
           // remove button to save the vehicle and the name input
           newVehicleInput.parentNode.removeChild(newVehicleInput);
@@ -100,9 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // add the label to vehicles.json
       let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
       if (labeledIdObject == undefined) {
-        vehiclesJSON[selectedVehicle].labeled_ids = {
-          id: label
-        };
+				vehiclesJSON[selectedVehicle].labeled_ids = {};
+				vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
       } else {
         vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
       }
@@ -111,9 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
       let fd = fs.openSync('vehicles.json', 'w');
       fs.writeSync(fd, jsonString);
 
-      // update the count and message tables to reflect the new labels
-      updateMessageTable(id, label);
-      updateCountTable(id, label);
+      // update the count and message tables to reflect the new labels, if tables have been created
+			if (tablesDrawn) {
+				updateMessageTable(id, label);
+	      updateCountTable(id, label);
+			}
     } else {
       alert("Please select a vehicle to add ID label to");
     }
@@ -128,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // when a label is updated, change massage counts table
-  const occurenceTableBody = document.getElementById('count-table-body');
+  const countTableBody = document.getElementById('count-table-body');
 
   function updateCountTable(updateID, newLabel) {
     let updateRow = document.getElementById(updateID.toString());
@@ -167,6 +170,9 @@ function createCountTable(idCounts) {
       newRow.appendChild(countTd);
       countTableBody.appendChild(newRow);
     });
+
+		// this is the last table that needs to be made, so...
+		tablesDrawn = true;
   }
 }
 
@@ -315,6 +321,7 @@ function populateVehicleProfileDropdown() {
   vehicleNames.forEach(name => vehicleDropdown.options.add(new Option(name)));
   // reselect the selected element since everything was previous removed
   vehicleDropdown.selectedIndex = selected;
+	selectedVehicle = vehicleDropdown[selected].value;
 }
 
 // on file change, return a string of the correct path depending on OS
