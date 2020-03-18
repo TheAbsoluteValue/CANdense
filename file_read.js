@@ -350,7 +350,6 @@ function clearIdLabels() {
 // adds a label to the row with the count of the given ID
 // only changes for a single id, massTableUpdate handles for ALL labeled IDs
 function updateCountTable(updateID, newLabel) {
-  alert(updateID);
   let updateTd = document.getElementById(updateID.toString());
   updateTd.innerHTML = newLabel;
 }
