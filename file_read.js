@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
       }
       let jsonString = JSON.stringify(vehiclesJSON);
-      console.log(jsonString);
       let fd = fs.openSync('vehicles.json', 'w');
       fs.writeSync(fd, jsonString);
 
@@ -141,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // creates the table to show user how many times messages of each ID occurred
 function createCountTable(idCounts) {
   {
-    let labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+    labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
     let countTableBody = document.getElementById('count-table-body');
     // array version of the object that has ID: count
     let idCountEntries = sortCountArray(Object.entries(idCounts));
@@ -339,24 +338,28 @@ function sortCountArray(arr) {
 
 // When the user selects a new vehicle, this event fires
 function vehicleSelectionChanged(event) {
-	clearIdLabels();  // different vehicle, labels are different
+  if (selectedVehicle !== "None" && selectedVehicle) {
+    clearIdLabels();  // different vehicle, labels are different
+  } else {
+
+  }
   selectedVehicle = event.target.value;
   populateVehicleProfileDropdown();
+  labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
 }
 
 // clears the labels from the table without redrawing the whole table
 function clearIdLabels() {
-  alert('update');
   // we know all IDs that have been changed, so just reset the innerHTML of each row
-  Object.keys(labeledIDs).forEach(id => {
-    alert('in');
-    console.log(document.getElementById(id));
-    document.getElementById(id).firstChild.innerHTML = id;
-    Array.from(document.getElementsByClassName(id)).forEach(rowId => {
-      rowId.innerHTML = id;
+  if (tablesDrawn) {
+    Object.keys(labeledIDs).forEach(id => {
+      document.getElementById(id).firstChild.innerHTML = id;
+      Array.from(document.getElementsByClassName(id)).forEach(rowId => {
+        rowId.innerHTML = id;
+      });
     });
-    labeledIDs = {};
-  });
+  }
+  labeledIDs = {};
 }
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
