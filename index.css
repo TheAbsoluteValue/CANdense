@@ -25,6 +25,11 @@ body {
   border-radius: 1px;
 }
 
+a:hover {
+    color: #ffc107;
+    text-decoration: underline;
+}
+
 /* .IndexBtn {
     display: inline-block;
     padding: 10px;

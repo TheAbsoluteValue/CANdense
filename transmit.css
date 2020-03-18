@@ -36,3 +36,8 @@ label {
   border: 2.5px solid white;
   border-radius: 1px;
 }
+
+a:hover {
+    color: #ffc107;
+    text-decoration: underline;
+}
