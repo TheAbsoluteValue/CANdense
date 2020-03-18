@@ -125,14 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // when a label is updated, show this change in the message table
   function updateMessageTable(updateID, newLabel) {
     let rowArray = Array.from(messageTBody.getElementsByClassName(updateID));
-    rowArray.forEach(tableRow => {
-      tableRow.innerHTML = newLabel;
+    rowArray.forEach(tableRowId => {
+      tableRowId.innerHTML = newLabel;
     });
   }
 
   // when a label is updated, change massage counts table
   const countTableBody = document.getElementById('count-table-body');
-
   function updateCountTable(updateID, newLabel) {
     let updateRow = document.getElementById(updateID.toString());
     updateRow.firstChild.innerHTML = newLabel;
@@ -340,8 +339,24 @@ function sortCountArray(arr) {
 
 // When the user selects a new vehicle, this event fires
 function vehicleSelectionChanged(event) {
+	clearIdLabels();  // different vehicle, labels are different
   selectedVehicle = event.target.value;
   populateVehicleProfileDropdown();
+}
+
+// clears the labels from the table without redrawing the whole table
+function clearIdLabels() {
+  alert('update');
+  // we know all IDs that have been changed, so just reset the innerHTML of each row
+  Object.keys(labeledIDs).forEach(id => {
+    alert('in');
+    console.log(document.getElementById(id));
+    document.getElementById(id).firstChild.innerHTML = id;
+    Array.from(document.getElementsByClassName(id)).forEach(rowId => {
+      rowId.innerHTML = id;
+    });
+    labeledIDs = {};
+  });
 }
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
