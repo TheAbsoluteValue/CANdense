@@ -25,7 +25,7 @@
 			</ul>
 		</nav>
     <hr id="navbar-rule">
-    
+
   <!-- DOM elements relevant to selecting vehicle profile -->
   <label id="vehicle-profile-label">Vehicle</label>
   <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
@@ -51,7 +51,7 @@
 
   <!-- table to display counts of each ID -->
   <h3 class="customHeader">Number of Messages by ID</h3>
-  <div id="occurrence-table-container">
+  <div id="count-table-container" class="customTable">
     <table align="center">
       <thead>
         <tr>
@@ -59,7 +59,7 @@
           <td class="tableHeader">Count</td>
         </tr>
       </thead>
-      <tbody id="occurrence-table-body">
+      <tbody id="count-table-body">
         <!-- to be populated after ALL messages are read/counted -->
       </tbody>
     </table>
