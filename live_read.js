@@ -30,6 +30,9 @@ const port = new SerialPort('PORT_PATH', { // TESTING port
     baudRate: 115200,
     highWaterMark: 45 // message can be AT most 45 bytes long (varying based on length of data)
 });
+port.on('data', () => {
+  port.drain();
+});
 
 // create the parser that emits data at the newline (how our messages are delimited)
 const parser = port.pipe(new Readline());  // parser.on('data') in startReading()
@@ -53,8 +56,8 @@ function startReading() {
   var i = 0;
   // creates the ReadLine parser, which is the final destination for the data
   parser.on('data', data => {
-    port.flush();
     let dataSplit = data.toString().split(' ');
+    port.flush();
     // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
     //if (dataSplit[2]) {
         // get the ID and message data
