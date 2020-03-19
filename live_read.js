@@ -28,17 +28,17 @@ MockBinding.createPort('PORT_PATH', {echo: true, record: false});
 //const port = new SerialPort('/dev/ttyUSB0', { // use instead of the previous line with real car
 const port = new SerialPort('PORT_PATH', { // TESTING port
     baudRate: 115200,
-    parser: SerialPort.parsers.readline,  // need to split messages at each line
-    highWaterMark: 90  										// max buffer size of the port
+    highWaterMark: 45 // message can be AT most 45 bytes long (varying based on length of data)
 });
 
 // create the parser that emits data at the newline (how our messages are delimited)
-const parser = port.pipe(new Readline());
+const parser = port.pipe(new Readline());  // parser.on('data') in startReading()
 
 // ReadStream to read from logFile (test only)
-logFile = fs.createReadStream(TEST_LOG_PATH,
-  {highWaterMark: 90} // max size to buffer when reading from the file
-);
+// logFile = fs.createReadStream(TEST_LOG_PATH,
+//   {highWaterMark: 90} // max size to buffer when reading from the file
+// );
+logFile = fs.createReadStream(TEST_LOG_PATH, {highWaterMark: 45});
 
 /*
   How data is read in and parsed:
@@ -50,15 +50,25 @@ logFile = fs.createReadStream(TEST_LOG_PATH,
   newline is encountered– not when the buffer is full.
  */
 function startReading() {
+  var i = 0;
   // creates the ReadLine parser, which is the final destination for the data
   parser.on('data', data => {
+    port.flush();
     let dataSplit = data.toString().split(' ');
     // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
-    if (dataSplit[2]) {
+    //if (dataSplit[2]) {
         // get the ID and message data
       const idData = dataSplit[2].split('#');
       let id = idData[0];
       let messageData = idData[1];
+
+      i++;
+    try {
+      console.log(dataSplit + " // " + data + " // " + i);
+    } catch (e) {
+      //console.log(e);
+      console.log("Error" + " // " + data + " // " + i);
+    }
 
       // make the time stamp dhuman-readable
       let unixTimeStamp = dataSplit[0].slice(1, -1);
@@ -76,7 +86,7 @@ function startReading() {
       // create table from JSON data array
       var messageHTML = tableify(messages);
       document.getElementById("table").innerHTML = messageHTML;
-    }
+    //}
   });
 
   // once the port opens, we pipe it to the readline parser
