@@ -254,39 +254,25 @@ function populateVehicleProfileDropdown() {
     selected = 0
   };
   // populate var with current files in directory based on OS
+  let vehicleFilePath; // different on Unix/Windows
   if (os === "Windows") {
-    try { // using 'r+' flag will throw exception when file doesn't exist
-      // r+ flag means reading/writing
-      vehiclesJSON = JSON.parse(fs.readFileSync('./vehicles.json', 'r+'));
-    } catch (e) { // file doesn't exist, so create it (and add "None" vehicle option)
-      // a+ open the file for reading/appending, creates file if does not exist
-      let newFile = fs.openSync('./vehicles.json', 'a+');
-      vehiclesJSON = {
-        "None": {
-          "received_ids": [],
-          "labeled_ids": {},
-          "notes": ""
-        }
-      };
-      fs.writeSync(newFile, JSON.stringify(vehiclesJSON));
-      fs.closeSync(newFile);
-    }
-  } else { // MacOS/Linux
-    // all comments from the os === "Windows" case apply here
-    try {
-      vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
-    } catch (e) {
-      let newFile = fs.openSync(process.cwd() + '/vehicles.json', 'a+');
-      vehiclesJSON = {
-        "None": {
-          "received_ids": [],
-          "labeled_ids": {},
-          "notes": ""
-        }
-      };
-      fs.writeSync(newFile, JSON.stringify(vehiclesJSON));
-      fs.closeSync(newFile);
-    }
+    vehicleFilePath = './vehicles.json';
+  } else {
+    vehicleFilePath = process.cwd() + '/vehicles.json';
+  }
+  try {
+    vehiclesJSON = JSON.parse(fs.readFileSync(process.cwd() + '/vehicles.json'));
+  } catch (e) {
+    let newFile = fs.openSync(process.cwd() + '/vehicles.json', 'a+');
+    vehiclesJSON = {
+      "None": {
+        "received_ids": [],
+        "labeled_ids": {},
+        "notes": ""
+      }
+    };
+    fs.writeSync(newFile, JSON.stringify(vehiclesJSON));
+    fs.closeSync(newFile);
   }
 
   /*
