@@ -13,7 +13,7 @@ const messages = {};
 const TEST_LOG_PATH = 'test_CANdump1.log';
 const TEST_MODE = true;  // set to false if connecting to real vehichle
 let loggingLocation;  // path messages will be recorded at
-let logMode;  // if the user wants to append to or truncate that log file
+//let logMode;  // if the user wants to append to or truncate that log file
 let fd;  // file descriptor (check docs for fs.open(...) return value)
 let recordingFileStream;  // the stream that is being used to record messages
 let isReading = false; // whether we are reading data or not
@@ -129,12 +129,12 @@ function toggleReadBtnPressed() {
 function setupRecorder() {
   loggingLocation = document.getElementById("logfile-path").value;
   // if the user hasn't entered a file name, generate one by default
-  if (!loggingLocation) {loggingLocation = `logs/CAN_${Date.now()}.log`;}
+  if (!loggingLocation) {loggingLocation = `CAN_${Date.now()}.log`;}
   if (!loggingLocation.endsWith('.log')) {
     loggingLocation = loggingLocation.concat('.log');
   }
-  logMode = document.querySelector('input[name="log-mode"]:checked').value;
-  fd = fs.openSync(loggingLocation, logMode);
+  // logMode = document.querySelector('input[name="log-mode"]:checked').value;
+  fd = fs.openSync(loggingLocation, 'w'); // truncate
 }
 
 // called from toggleRecordBtnPressed

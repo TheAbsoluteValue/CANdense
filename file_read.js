@@ -17,7 +17,7 @@ const idCounts = {}; // the count of each message (used in count table)
 let tablesDrawn = false;  // whether both tables are drawn
 
 
-// don't do anything until all DOM element load
+// don't do anything until all DOM element loadread-btn
 document.addEventListener('DOMContentLoaded', () => {
   populateVehicleProfileDropdown(); // load in vehicle profiles for selection
   populateSelectFileDropdown(); // load list of log file names for selection
@@ -225,6 +225,8 @@ function readLogFile(path) {
     createMessageTable(data)
   });
 
+  // un-hide table headers
+  document.getElementById('CanMessageTables').hidden = false;
   // once table is done bulding, show it
   document.getElementById('message-table-container').hidden = false;
 }
