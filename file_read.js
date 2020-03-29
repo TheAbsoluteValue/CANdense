@@ -431,11 +431,13 @@ function clearFilters() {
   hiddenRows.forEach(row => {
     row.hidden = false;
   });
-  hiddenRows.empty()
-  filters.by_id.empty();
-  filters.by_time.empty();
-  filters.by_msg_freq.empty();
-  filters.by_data_value.empty();
+  
+  // setting length == 0 clears the list
+  hiddenRows.length = 0;
+  filters.by_id.length = 0;
+  filters.by_time.length = 0;
+  filters.by_msg_freq.length = 0;
+  filters.by_data_value.length = 0;
 }
 
 
