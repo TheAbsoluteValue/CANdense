@@ -28,8 +28,10 @@ MockBinding.createPort('PORT_PATH', {echo: true, record: false});
 //const port = new SerialPort('/dev/ttyUSB0', { // use instead of the previous line with real car
 const port = new SerialPort('PORT_PATH', { // TESTING port
     baudRate: 115200,
+    autoOpen: false,
     highWaterMark: 45 // message can be AT most 45 bytes long (varying based on length of data)
 });
+
 port.on('data', () => {
   port.drain();
 });
@@ -57,7 +59,6 @@ function startReading() {
   // creates the ReadLine parser, which is the final destination for the data
   parser.on('data', data => {
     let dataSplit = data.toString().split(' ');
-    port.flush();
     // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
     //if (dataSplit[2]) {
         // get the ID and message data
@@ -91,11 +92,10 @@ function startReading() {
       document.getElementById("table").innerHTML = messageHTML;
     //}
   });
-
+  port.open();
   // once the port opens, we pipe it to the readline parser
   port.pipe(parser);
-
-  // create the file reader (only for demo purposes)
+  // create the file reader (only for demo/testing purposes)
   logFile.pipe(port);  // send all data to the port
 }
 
