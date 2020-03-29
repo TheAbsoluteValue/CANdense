@@ -10,12 +10,18 @@ let fileOptions; // list of the files the user can read in
 let selectedPath; // the path to the log file the user wants
 let vehiclesJSON; // vehicles.json parsed as an object
 let vehicleDropdown; // dropdown user can select vehicle profile from
-// TODO: add this as first option in vehicle dropdown
 let selectedVehicle = "None"; // name of the vehicle the user has selected
 let labeledIDs = {}; // object holding labeled IDs
 const idCounts = {}; // the count of each message (used in count table)
-let tablesDrawn = false;  // whether both tables are drawn
-
+let tablesDrawn = false; // whether both tables are drawn
+// to filter the table's rows by various values of these parameters
+const filters = {
+  by_id: [],
+  by_msg_freq: [],
+  by_data_value: [],
+  by_time: []
+};
+const hiddenRows = [] // list of rows hidden by filter; used to show them after clearning filter
 
 // don't do anything until all DOM element loadread-btn
 document.addEventListener('DOMContentLoaded', () => {
@@ -58,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
           populateVehicleProfileDropdown();
           // make the newly added vehicle the selected one
           vehicleDropdown.options[vehicleDropdown.options.length - 1].selected = true;
-					selectedVehicle = vehicleName;
+          selectedVehicle = vehicleName;
 
           // remove button to save the vehicle and the name input
           newVehicleInput.parentNode.removeChild(newVehicleInput);
@@ -103,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // add the label to vehicles.json
       let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
       if (labeledIdObject == undefined) {
-				vehiclesJSON[selectedVehicle].labeled_ids = {};
-				vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+        vehiclesJSON[selectedVehicle].labeled_ids = {};
+        vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
       } else {
         vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
       }
@@ -113,13 +119,24 @@ document.addEventListener('DOMContentLoaded', () => {
       fs.writeSync(fd, jsonString);
 
       // update the count and message tables to reflect the new labels, if tables have been created
-			if (tablesDrawn) {
-				updateMessageTable(id, label);
-	      updateCountTable(id, label);
-			}
+      if (tablesDrawn) {
+        updateMessageTable(id, label);
+        updateCountTable(id, label);
+      }
     } else {
       alert("Please select a vehicle to add ID label to");
     }
+  });
+
+  // for updating filters
+  document.getElementById('apply-filter-btn').addEventListener('click', () => {
+    updateFilters();
+    filterTables();
+  });
+
+  // for clearing filters
+  document.getElementById('clear-filter-btn').addEventListener('click', () => {
+    clearFilters();
   });
 });
 
@@ -155,8 +172,8 @@ function createCountTable(idCounts) {
       countTableBody.appendChild(newRow);
     });
 
-		// this is the last table that needs to be made, so...
-		tablesDrawn = true;
+    // this is the last table that needs to be made, so...
+    tablesDrawn = true;
   }
 }
 
@@ -293,7 +310,7 @@ function populateVehicleProfileDropdown() {
   vehicleNames.forEach(name => vehicleDropdown.options.add(new Option(name)));
   // reselect the selected element since everything was previous removed
   vehicleDropdown.selectedIndex = selected;
-	selectedVehicle = vehicleDropdown[selected].value;
+  selectedVehicle = vehicleDropdown[selected].value;
 }
 
 // on file change, return a string of the correct path depending on OS
@@ -312,7 +329,7 @@ function sortCountArray(arr) {
 
 // When the user selects a new vehicle, this event fires
 function vehicleSelectionChanged(event) {
-  clearIdLabels();  // different vehicle, labels are different
+  clearIdLabels(); // different vehicle, labels are different
   selectedVehicle = event.target.value;
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
   if (tablesDrawn) {
@@ -358,6 +375,69 @@ function massTableUpdate() {
     updateMessageTable(entry[0], entry[1]);
   });
 }
+
+/* Filters */
+function updateFilters() {
+  let timeFilter = document.getElementById('time-filter');
+  let idFilter = document.getElementById('id-filter');
+  let msgFreqFilter = document.getElementById('msg-freq-filter');
+  let dataValFilter = document.getElementById('data-val-filter');
+
+  // // TODO: not sure how this would work for file reading
+  // if (timeFilter.value) {
+  // }
+
+  // TODO: should we do this just by numeric ID, or by label as well?
+  if (idFilter.value) {
+    // split on space, or comma, or both
+    filters.by_id = idFilter.value.split(/[\s|,]+/);
+  }
+
+  // TODO: should add some tolerance amount (e.g. ± 5 occurrences)
+  if (msgFreqFilter.value) {
+    filters.by_msg_freq = msgFreqFilter.value.split(/[\s|,]+/);
+  }
+
+  if (dataValFilter.value) {
+    filters.by_data_value = dataValFilter.value.split(/[\s|,]+/);
+  }
+}
+
+function filterTables() {
+  let messageTableRowArray = Array.from(messageTableBody.children);
+  let countTableRowArray = Array.from(countTableBody.children);
+
+  messageTableRowArray.forEach(row => {
+    // basically if the row's ID or its label (class) aren't in the list of IDs to filter by, hide
+    if (!(filters.by_id.includes(row.firstChild.textContent) ||
+        filters.by_id.includes(row.firstChild.classList[1].textContent))) {
+      row.hidden = true;
+      hiddenRows.push(row);
+    }
+  });
+
+  countTableRowArray.forEach(row => {
+    if (!((filters.by_id.includes(row.firstChild.textContent) ||
+          filters.by_id.includes(row.firstChild.id.textContent)) &&
+        filters.by_data_value.includes(row.children[1].textContext))) {
+      row.hidden = true;
+      hiddenRows.push(row);
+      row.hidden = true;
+    }
+  });
+}
+
+function clearFilters() {
+  hiddenRows.forEach(row => {
+    row.hidden = false;
+  });
+  hiddenRows.empty()
+  filters.by_id.empty();
+  filters.by_time.empty();
+  filters.by_msg_freq.empty();
+  filters.by_data_value.empty();
+}
+
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
 function getOS() {
