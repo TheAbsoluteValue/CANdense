@@ -23,6 +23,12 @@ const filters = {
 };
 const hiddenRows = [] // list of rows hidden by filter; used to show them after clearning filter
 
+let timeFilter;
+let idFilter;
+let msgFreqFilter;
+let msgFreqTolerance;
+let dataValFilter;
+
 // don't do anything until all DOM element loadread-btn
 document.addEventListener('DOMContentLoaded', () => {
   populateVehicleProfileDropdown(); // load in vehicle profiles for selection
@@ -378,10 +384,11 @@ function massTableUpdate() {
 
 /* Filters */
 function updateFilters() {
-  let timeFilter = document.getElementById('time-filter');
-  let idFilter = document.getElementById('id-filter');
-  let msgFreqFilter = document.getElementById('msg-freq-filter');
-  let dataValFilter = document.getElementById('data-val-filter');
+  timeFilter = document.getElementById('time-filter');
+  idFilter = document.getElementById('id-filter');
+  msgFreqFilter = document.getElementById('msg-freq-filter');
+  msgFreqTolerance = document.getElementById('msg-freq-tolerance');
+  dataValFilter = document.getElementById('data-val-filter');
 
   // don't want previous filters to persist
   clearFilters();
@@ -396,9 +403,9 @@ function updateFilters() {
     filters.by_id = idFilter.value.split(/[\s|,]+/);
   }
 
-  // TODO: should add some tolerance amount (e.g. ± 5 occurrences)
   if (msgFreqFilter.value) {
-    filters.by_msg_freq = msgFreqFilter.value.split(/[\s|,]+/);
+    let frequencies = msgFreqFilter.value.split(/[\s|,]+/).map(Number);
+    filters.by_msg_freq = frequencies;
   }
 
   if (dataValFilter.value) {
@@ -407,14 +414,25 @@ function updateFilters() {
 }
 
 function filterTables() {
-  // amake arrays of table rows so they can be easily iterated through
+  // make arrays of table rows so they can be easily iterated through
   let messageTableRowArray = Array.from(messageTableBody.children);
   let countTableRowArray = Array.from(countTableBody.children);
   // used in determining whether to hide a row
   const idFilterExists = filters.by_id.length > 0;
   const frequencyFilterExists = filters.by_msg_freq.length > 0;
+  const frequencyToleranceExists = Boolean(msgFreqTolerance.value);
+  let frequencyValues = filters.by_msg_freq;
+  if (frequencyToleranceExists) {
+    alert("FTE!");
+    frequencyValues = generateRanges(frequencyValues, Number(msgFreqTolerance.value));
+    console.log(frequencyValues);
+  }
   const dataFilterExists = filters.by_data_value.length > 0;
 
+  /* Filters messages for the table that displays ALL messages. In this table, messages will be
+  filtered by ID (or its label), data field value, and time step. The count filter is not applicable
+  to this table since it does not display message counts (that is what the other table is for).
+  */
   messageTableRowArray.forEach(row => {
     if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
           filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) &&
@@ -424,8 +442,22 @@ function filterTables() {
     }
   });
 
+  /* Filters messages for the table that just displays the occurrence count of each message.
+  The rows are filtered by ID (or its label) and by message count. The data field and time stamp
+  filters do not apply to the data present in this table.
+  */
   countTableRowArray.forEach(row => {
-    if (!(idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? filters.by_msg_freq.includes(row.children[1].textContext) : true)) {
+    /* Table rows are hidden if they do not satisfy ALL filter constraints the user has added.
+    For each type of filter, we need to check if the user has even entered any values for that
+    filter type. If the user has not entered a filter in that category, the ternary operator just
+    evaluates to true because we do not want it to have an effect on whether the row is hidden.
+    If the user has entered an ID filter (either by the hex ID or its label), we check if the row
+    is for the ID that we want to see. If it is not, the row will be hiddem; if it is, whether the
+    row is hidden depends on whether the message can pass the frequency filter.
+    If the user has entered a frequency (count) filter, then we check to see if the row indicates
+    the proper number of occurrences. Obviously, if it doesn't the row is hidden.
+    */
+    if (!((idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : true))) {
       row.hidden = true;
       hiddenRows.push(row);
       row.hidden = true;
@@ -446,6 +478,23 @@ function clearFilters() {
   filters.by_data_value.length = 0;
 }
 
+/* Given a list of integers, returns a new list that contains all the original numbers as well as
+those numbers ± the specificed deviation amount.
+E.g. generateRanges([5, 13], 2)) ==> [3,4,5,6,7,11,12,13,14,15]
+Used when a tolerance is specified in the message frequency filter
+*/
+function generateRanges(list, deviation) {
+  let r = [];
+  list.forEach(num => {
+    var startVal = num - deviation >= 0 ? num - deviation : 0;  // prevent from generating neg. num
+    var endVal = num + deviation;
+    for (i = startVal; i <= endVal; i++) {
+      if (!r.includes(i)) {r.push(i);}
+    }
+  });
+
+  return r;
+}
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
 function getOS() {
