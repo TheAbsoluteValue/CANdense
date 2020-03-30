@@ -1,8 +1,8 @@
 const SerialPort = require('serialport');
 const MockBinding = require('@serialport/binding-mock');
-const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
 const tableify = require('tableify');
+const parsers = SerialPort.parsers;
 
 /*
 	This object holds one entry for each ID, where it is updated when another message with the
@@ -27,13 +27,16 @@ SerialPort.Binding = MockBinding;
 MockBinding.createPort('PORT_PATH', {echo: true, record: false});
 //const port = new SerialPort('/dev/ttyUSB0', { // use instead of the previous line with real car
 const port = new SerialPort('PORT_PATH', { // TESTING port
-    baudRate: 115200,
-    parser: SerialPort.parsers.readline,  // need to split messages at each line
-    highWaterMark: 90  										// max buffer size of the port
+    baudRate: 115200										// max buffer size of the port
 });
 
 // create the parser that emits data at the newline (how our messages are delimited)
-const parser = port.pipe(new Readline());
+const parser = new parsers.Readline({
+  delimiter: '\r\n',
+});
+
+// once the port opens, we pipe it to the readline parser
+port.pipe(parser);
 
 // ReadStream to read from logFile (test only)
 logFile = fs.createReadStream(TEST_LOG_PATH,
@@ -49,42 +52,42 @@ logFile = fs.createReadStream(TEST_LOG_PATH,
   the port in to the ReadLine parser, we eliminate this problem because it only emits data once a
   newline is encountered– not when the buffer is full.
  */
+
 function startReading() {
+
   // creates the ReadLine parser, which is the final destination for the data
   parser.on('data', data => {
     let dataSplit = data.toString().split(' ');
-    // TODO: this is if(...) just a bandaid; sometimes dataSolut[2] is undefined... not sure why
-    if (dataSplit[2]) {
-        // get the ID and message data
-      const idData = dataSplit[2].split('#');
-      let id = idData[0];
-      let messageData = idData[1];
+    // get the ID and message data
+    let id = dataSplit[2].slice(0, 3);
+    let messageData = dataSplit[2].slice(4);
 
-      // make the time stamp dhuman-readable
-      let unixTimeStamp = dataSplit[0].slice(1, -1);
-      let date = new Date(parseFloat(unixTimeStamp));
-      let hours = date.getHours();
-      let minutes = date.getMinutes();
-      let seconds = date.getSeconds();
-      let milliseconds = date.getMilliseconds();
-      let arr = [hours, minutes, seconds, milliseconds];
-      let timeString = [hours, minutes, seconds, milliseconds].join(':');
+    // make the time stamp dhuman-readable
+    let unixTimeStamp = dataSplit[0].slice(1, -1);
+    let date = new Date(parseFloat(unixTimeStamp));
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let seconds = date.getSeconds();
+    let milliseconds = date.getMilliseconds();
+    let arr = [hours, minutes, seconds, milliseconds];
+    let timeString = [hours, minutes, seconds, milliseconds].join(':');
 
-      // increment the count of the id if it occurs again
-      let messageCount = messages[id] ? messages[id]["count"] : 0;
-      messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
-      // create table from JSON data array
-      var messageHTML = tableify(messages);
-      document.getElementById("table").innerHTML = messageHTML;
-    }
+    // increment the count of the id if it occurs again
+    let messageCount = messages[id] ? messages[id]["count"] : 0;
+    messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
+    // create table from JSON data array
+    var messageHTML = tableify(messages);
+    document.getElementById("table").innerHTML = messageHTML;
+
+
   });
 
-  // once the port opens, we pipe it to the readline parser
-  port.pipe(parser);
+
 
   // create the file reader (only for demo purposes)
   logFile.pipe(port);  // send all data to the port
 }
+
 
 function pauseReading() {
   logFile.unpipe();
@@ -113,6 +116,7 @@ function toggleReadBtnPressed() {
   specifying the path, or if the user tries to record before the function
   has been called
 */
+
 function setupRecorder() {
   loggingLocation = document.getElementById("logfile-path").value;
   // if the user hasn't entered a file name, generate one by default
