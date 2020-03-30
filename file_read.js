@@ -383,6 +383,9 @@ function updateFilters() {
   let msgFreqFilter = document.getElementById('msg-freq-filter');
   let dataValFilter = document.getElementById('data-val-filter');
 
+  // don't want previous filters to persist
+  clearFilters();
+
   // // TODO: not sure how this would work for file reading
   // if (timeFilter.value) {
   // }
@@ -413,16 +416,16 @@ function filterTables() {
   const dataFilterExists = filters.by_data_value.length > 0;
 
   messageTableRowArray.forEach(row => {
-    // basically if the row's ID or its label (class) aren't in the list of IDs to filter by, hide
-    if (!(filters.by_id.includes(row.firstChild.textContent) ||
-        filters.by_id.includes(row.firstChild.classList[1].textContent))) {
+    if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
+          filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) &&
+        (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : true))) {
       row.hidden = true;
       hiddenRows.push(row);
     }
   });
 
   countTableRowArray.forEach(row => {
-    if (!(idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? filters._msg_freq.includes(row.children[1].textContext) : true)) {
+    if (!(idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? filters.by_msg_freq.includes(row.children[1].textContext) : true)) {
       row.hidden = true;
       hiddenRows.push(row);
       row.hidden = true;
