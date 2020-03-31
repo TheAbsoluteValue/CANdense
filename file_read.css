@@ -53,3 +53,7 @@ a:hover {
 #centerAlign div {
   display: inline-block;
 }
+
+table, th, td {
+  border: 2px solid black
+}
