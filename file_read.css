@@ -32,17 +32,21 @@ a:hover {
   float: left;
   display: inline-block;
   width: 50%;
+  text-align: center;
+  padding: 10px;
 }
 
 .horizontal-container {
   display: flex;
   padding: 15px;
+  text-align: center;
 }
 
 .root-div {
   border: solid white;
   width: 90%;
-  margin-top: 40px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   padding: 15px;
 }
 

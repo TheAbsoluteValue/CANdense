@@ -42,8 +42,9 @@
       <div class="horizontal-container">
         <div class="horizontal-5050-div">
           <!-- DOM elements relevant to selecting vehicle profile -->
-          <label id="vehicle-profile-label">Vehicle</label>
-          <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
+          <label id="vehicle-profile-label">Vehicle <br>
+            <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select></label>
+          <br>
           <button id="add-vehicle-btn">+</button>
           <br>
         </div>
@@ -60,67 +61,88 @@
       </div>
     </div>
 
-
     <!-- DOM elements for filtering -->
     <div class="root-div">
       <div>
-        <h5>Filters</h5>
+        <h5>Count Table Filters</h5>
+        <div class="horizontal-container">
+          <div class="horizontal-5050-div">
+            <label for="table-count-id-filter">ID <br><input type="text" name="table-count-id-filter" id="table-count-id-filter"></label>
+            <br><br>
+            <div>
+              <label>OR <input type="radio" value="OR" name="table-count-filter-operator" selected></label>
+              <label>AND <input type="radio" value="AND" name="table-count-filter-operator"></label>
+            </div>
+          </div>
+          <div class="horizontal-5050-div">
+            <label for="table-count-freq-filter">ID Frequency<br><input type="number" name="table-count-freq-filter" id="table-count-freq-filter"></label>
+            <label for="msg-freq-tolerance">Frequency Tolerance <br><input type="number" name="table-count-msg-freq-tolerance" id="table-count-freq-tolerance" class="input-small"></label>
+          </div>
+          <br>
+        </div>
+        <button id="table-count-apply-filter-btn">Filter</button>
+        <button id="table-count-clear-filter-btn">Clear</button>
       </div>
+    </div>
+
+  <div class="root-div">
+    <div>
+      <h5>All Message Filters</h5>
       <div class="horizontal-container">
         <div class="horizontal-5050-div">
-          <label for="id-filter">ID <br><input type="text" name="id-filter" id="id-filter"></label>
+          <label for="table-all-id-filter">ID <br><input type="text" name="table-all-id-filter" id="table-all-id-filter"></label>
         </div>
         <div class="horizontal-5050-div">
-          <label for="data-val-filter">Data Field <br><input type="text" name="data-val-filter" id="data-val-filter"></label>
+          <label for="table-all-data-val-filter">Data Field <br><input type="text" name="table-all-data-val-filter" id="table-all-data-val-filter"></label>
         </div>
       </div>
       <div>
-        <label for="msg-freq-filter">ID Frequency <br><input type="number" name="msg-freq-filter" id="msg-freq-filter" class="input-small"></label>
-        <label for="msg-freq-tolerance">Tolerance (optional)</label>
-        <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance" class="input-small">
+        <label>OR <input type="radio" value="OR" name="table-all-filter-operator" selected></label>
+        <label>AND <input type="radio" value="AND" name="table-all-filter-operator"></label> <br>
       </div>
-      <button id="apply-filter-btn">Filter</button>
-      <button id="clear-filter-btn">Clear</button>
+      <button id="table-all-apply-filter-btn">Filter</button>
+      <button id="table-all-clear-filter-btn">Clear</button>
+    </div>
+  </div>
+
+  <!-- table to display counts of each ID -->
+  <div id="CanMessageTables" hidden>
+    <h3 class="customHeader">Number of Messages by ID</h3>
+    <div id="count-table-container" class="customTable">
+      <table align="center">
+        <thead>
+          <tr>
+            <td class="tableHeader">ID</td>
+            <td class="tableHeader">Count</td>
+          </tr>
+        </thead>
+        <tbody id="count-table-body">
+          <!-- to be populated after ALL messages are read/counted -->
+        </tbody>
+      </table>
+    </div>
+    <br><br><br>
+
+    <!-- table to display all messages from the log file -->
+    <h3 class="customHeader">Messages from CAN</h3>
+    <div id="message-table-container" class="customTable" hidden>
+      <table align="center">
+        <thead>
+          <tr>
+            <td class="tableHeader">ID</td>
+            <td class="tableHeader">Content</td>
+            <td class="tableHeader">Time</td>
+          </tr>
+        </thead>
+        <tbody id="message-table-body">
+          <!-- to be populated as each message is read -->
+        </tbody>
+      </table>
     </div>
 
-    <!-- table to display counts of each ID -->
-    <div id="CanMessageTables" hidden>
-      <h3 class="customHeader">Number of Messages by ID</h3>
-      <div id="count-table-container" class="customTable">
-        <table align="center">
-          <thead>
-            <tr>
-              <td class="tableHeader">ID</td>
-              <td class="tableHeader">Count</td>
-            </tr>
-          </thead>
-          <tbody id="count-table-body">
-            <!-- to be populated after ALL messages are read/counted -->
-          </tbody>
-        </table>
-      </div>
-      <br><br><br>
-
-      <!-- table to display all messages from the log file -->
-      <h3 class="customHeader">Messages from CAN</h3>
-      <div id="message-table-container" class="customTable" hidden>
-        <table align="center">
-          <thead>
-            <tr>
-              <td class="tableHeader">ID</td>
-              <td class="tableHeader">Content</td>
-              <td class="tableHeader">Time</td>
-            </tr>
-          </thead>
-          <tbody id="message-table-body">
-            <!-- to be populated as each message is read -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- make this user input -->
-      <p id="notes" class="customNotes"></p>
-    </div>
+    <!-- make this user input -->
+    <p id="notes" class="customNotes"></p>
+  </div>
   </div>
 </body>
 <script src="./file_read.js"></script>
