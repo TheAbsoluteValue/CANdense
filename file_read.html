@@ -1,108 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="file_read.css">
   <!-- make this drop-down select based on files for different makes? -->
   <h3 id="customHeader">CanDense</h3>
 </head>
+
 <body>
   <div id="centerAlign">
-		<nav id="navbar">
-			<ul class="list-inline">
-				<li class="list-inline-item">
-					<a href="live_read.html" class="navbar-link">Live Read</a>
-				</li>
-				<li class="list-inline-item">
-					<a href="file_read.html" class="navbar-link">File Read</a>
-				</li>
-				<li class="list-inline-item">
-					<a href="transmit.html" class="navbar-link">Transmit</a>
-				</li>
-				<li class="list-inline-item">
-					<a href="settings.html" class="navbar-link">Settings</a>
-				</li>
-			</ul>
-		</nav>
+    <nav id="navbar">
+      <ul class="list-inline">
+        <li class="list-inline-item">
+          <a href="live_read.html" class="navbar-link">Live Read</a>
+        </li>
+        <li class="list-inline-item">
+          <a href="file_read.html" class="navbar-link">File Read</a>
+        </li>
+        <li class="list-inline-item">
+          <a href="transmit.html" class="navbar-link">Transmit</a>
+        </li>
+        <li class="list-inline-item">
+          <a href="settings.html" class="navbar-link">Settings</a>
+        </li>
+      </ul>
+    </nav>
     <hr id="navbar-rule">
 
-  <!-- DOM elements relevant to selecting vehicle profile -->
-  <label id="vehicle-profile-label">Vehicle</label>
-  <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
-  <button id="add-vehicle-btn">+</button>
-  <br>
+    <!-- DOM elements relevant to selecting the log file to read -->
+    <label id="logfile-label">Log file<br><select type="file" id="logfile-path-dropdown" onChange="logFileSelectionChanged(event)"></select></label>
 
-  <!-- DOM elements relevant to selecting the log file to read -->
-  <label id="logfile-label">Log file path</label>
-  <select type="file" id="logfile-path-dropdown" onChange="logFileSelectionChanged(event)">
-  </select>
-  <button id="read-btn">Read</button>
-  <br>
-  <!-- DOM elements relevant to adding labels to IDs -->
-  <label for="id-input">ID</label>
-  <input type="text" id="id-input" name="id-input" length=3>
-  <label for="label-input">Label</label>
-  <input type="text" id="label-input" name="label-input" length=16>
-  <button id="add-label-btn">Add ID label</button>
+    <button id="read-btn">Read</button>
+    <br>
 
-  <!-- DOM elements for filtering -->
-  <div>
-    <h3>Filters</h3>
-    <label for="time-filter">Time (ms)</label>
-    <input type="text" name="time-filter" id="time-filter">
-    <label for="id-filter">ID</label>
-    <input type="text" name="id-filter" id="id-filter">
-    <div>
-      <label for="msg-freq-filter">ID Frequency</label>
-      <input type="text" name="msg-freq-filter" id="msg-freq-filter">
-      <label for="msg-freq-tolerance">Tolerance (optional)</label>
-      <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance">
+
+    <div class="root-div">
+      <div>
+        <h5>Vehicle Profile</h5>
+      </div> <br>
+      <div class="horizontal-container">
+        <div class="horizontal-5050-div">
+          <!-- DOM elements relevant to selecting vehicle profile -->
+          <label id="vehicle-profile-label">Vehicle</label>
+          <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
+          <button id="add-vehicle-btn">+</button>
+          <br>
+        </div>
+        <div class="horizontal-5050-div">
+          <!-- DOM elements relevant to adding labels to IDs -->
+          <div>
+            <label for="id-input">ID<br><input type="text" id="id-input" name="id-input" length=3></label>
+          </div>
+          <div>
+            <label for="label-input">Label<br><input type="text" id="label-input" name="label-input" length=16></label> <br>
+            <button id="add-label-btn">Add ID label</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <label for="data-val-filter">Data Field</label>
-    <input type="text" name="data-val-filter" id="data-val-filter">
-    <button id="apply-filter-btn">Filter</button>
-    <button id="clear-filter-btn">Clear</button>
-  </div>
 
-  <!-- table to display counts of each ID -->
-<div id="CanMessageTables" hidden>
-  <h3 class="customHeader">Number of Messages by ID</h3>
-  <div id="count-table-container" class="customTable">
-    <table align="center">
-      <thead>
-        <tr>
-          <td class="tableHeader">ID</td>
-          <td class="tableHeader">Count</td>
-        </tr>
-      </thead>
-      <tbody id="count-table-body">
-        <!-- to be populated after ALL messages are read/counted -->
-      </tbody>
-    </table>
-  </div>
-  <br><br><br>
 
-  <!-- table to display all messages from the log file -->
-  <h3 class="customHeader">Messages from CAN</h3>
-  <div id="message-table-container" class="customTable" hidden>
-    <table align="center">
-      <thead>
-        <tr>
-          <td class="tableHeader">ID</td>
-          <td class="tableHeader">Content</td>
-          <td class="tableHeader">Time</td>
-        </tr>
-      </thead>
-      <tbody id="message-table-body">
-        <!-- to be populated as each message is read -->
-      </tbody>
-    </table>
-  </div>
-
-    <!-- make this user input -->
-    <p id="notes" class="customNotes"></p>
+    <!-- DOM elements for filtering -->
+    <div class="root-div">
+      <div>
+        <h5>Filters</h5>
+      </div>
+      <div class="horizontal-container">
+        <div class="horizontal-5050-div">
+          <label for="id-filter">ID <br><input type="text" name="id-filter" id="id-filter"></label>
+        </div>
+        <div class="horizontal-5050-div">
+          <label for="data-val-filter">Data Field <br><input type="text" name="data-val-filter" id="data-val-filter"></label>
+        </div>
+      </div>
+      <div>
+        <label for="msg-freq-filter">ID Frequency <br><input type="number" name="msg-freq-filter" id="msg-freq-filter" class="input-small"></label>
+        <label for="msg-freq-tolerance">Tolerance (optional)</label>
+        <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance" class="input-small">
+      </div>
+      <button id="apply-filter-btn">Filter</button>
+      <button id="clear-filter-btn">Clear</button>
     </div>
-</div>
+
+    <!-- table to display counts of each ID -->
+    <div id="CanMessageTables" hidden>
+      <h3 class="customHeader">Number of Messages by ID</h3>
+      <div id="count-table-container" class="customTable">
+        <table align="center">
+          <thead>
+            <tr>
+              <td class="tableHeader">ID</td>
+              <td class="tableHeader">Count</td>
+            </tr>
+          </thead>
+          <tbody id="count-table-body">
+            <!-- to be populated after ALL messages are read/counted -->
+          </tbody>
+        </table>
+      </div>
+      <br><br><br>
+
+      <!-- table to display all messages from the log file -->
+      <h3 class="customHeader">Messages from CAN</h3>
+      <div id="message-table-container" class="customTable" hidden>
+        <table align="center">
+          <thead>
+            <tr>
+              <td class="tableHeader">ID</td>
+              <td class="tableHeader">Content</td>
+              <td class="tableHeader">Time</td>
+            </tr>
+          </thead>
+          <tbody id="message-table-body">
+            <!-- to be populated as each message is read -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- make this user input -->
+      <p id="notes" class="customNotes"></p>
+    </div>
+  </div>
 </body>
 <script src="./file_read.js"></script>
+
 </html>

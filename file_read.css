@@ -27,3 +27,29 @@ a:hover {
     color: #ffc107;
     text-decoration: underline;
 }
+
+.horizontal-5050-div {
+  float: left;
+  display: inline-block;
+  width: 50%;
+}
+
+.horizontal-container {
+  display: flex;
+  padding: 15px;
+}
+
+.root-div {
+  border: solid white;
+  width: 90%;
+  margin-top: 40px;
+  padding: 15px;
+}
+
+.input-small {
+  width: 40%;
+}
+
+#centerAlign div {
+  display: inline-block;
+}
