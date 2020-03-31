@@ -14,20 +14,24 @@ let selectedVehicle = "None"; // name of the vehicle the user has selected
 let labeledIDs = {}; // object holding labeled IDs
 const idCounts = {}; // the count of each message (used in count table)
 let tablesDrawn = false; // whether both tables are drawn
-// to filter the table's rows by various values of these parameters
-const filters = {
+// to filter the count table's rows by various parameters
+const countTableFilters = {
   by_id: [],
-  by_msg_freq: [],
-  by_data_value: [],
-  by_time: []
-};
-const hiddenRows = [] // list of rows hidden by filter; used to show them after clearning filter
-
-let timeFilter;
-let idFilter;
-let msgFreqFilter;
-let msgFreqTolerance;
-let dataValFilter;
+  by_msg_freq: []
+}
+// to filter the table with all messages by various parameters
+const msgTableFilters = {
+  by_id: [],
+  by_data_value: []
+}
+const countHiddenRows = [] // list of rows of the count table hidden by filter; makes unhdiding easy
+const msgHiddenRows = [] // list of rows of all message table hidden by filter;
+                         // makes unhiding easier
+let countIdFilter;  // for the count table
+let freqFilter;  // for the count table
+let freqTolerance; // for the count table
+let msgIdFilter; // for the table with all messages
+let dataValFilter; // for the table with all messages
 
 // don't do anything until all DOM element loadread-btn
 document.addEventListener('DOMContentLoaded', () => {
@@ -413,40 +417,23 @@ function updateFilters() {
   }
 }
 
-function filterTables() {
-  // make arrays of table rows so they can be easily iterated through
-  let messageTableRowArray = Array.from(messageTableBody.children);
-  let countTableRowArray = Array.from(countTableBody.children);
-  // used in determining whether to hide a row
-  const idFilterExists = filters.by_id.length > 0;
-  const frequencyFilterExists = filters.by_msg_freq.length > 0;
-  const frequencyToleranceExists = Boolean(msgFreqTolerance.value);
+function filterCountTable() {
+  let operator = document.querySelector('input[name="table-count-filter-operator"]:checked').value;
+  // Array is more easily iterated through than HTMLcollection
+  let rowArray = Array.from(countTableBody.children);
+  const idFilterExists = countTableFilters.by_id.length > 0;
+  const frequencyFilterExists = countTableFilters.by_msg_freq.length > 0;
+  const frequencyToleranceExists = Boolean(msgFreqTolerance.value); f
   let frequencyValues = filters.by_msg_freq;
   if (frequencyToleranceExists) {
-    alert("FTE!");
     frequencyValues = generateRanges(frequencyValues, Number(msgFreqTolerance.value));
-    console.log(frequencyValues);
   }
-  const dataFilterExists = filters.by_data_value.length > 0;
-
-  /* Filters messages for the table that displays ALL messages. In this table, messages will be
-  filtered by ID (or its label), data field value, and time step. The count filter is not applicable
-  to this table since it does not display message counts (that is what the other table is for).
-  */
-  messageTableRowArray.forEach(row => {
-    if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
-          filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) &&
-        (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : true))) {
-      row.hidden = true;
-      hiddenRows.push(row);
-    }
-  });
 
   /* Filters messages for the table that just displays the occurrence count of each message.
   The rows are filtered by ID (or its label) and by message count. The data field and time stamp
   filters do not apply to the data present in this table.
   */
-  countTableRowArray.forEach(row => {
+  rowArray.forEach(row => {
     /* Table rows are hidden if they do not satisfy ALL filter constraints the user has added.
     For each type of filter, we need to check if the user has even entered any values for that
     filter type. If the user has not entered a filter in that category, the ternary operator just
@@ -457,12 +444,73 @@ function filterTables() {
     If the user has entered a frequency (count) filter, then we check to see if the row indicates
     the proper number of occurrences. Obviously, if it doesn't the row is hidden.
     */
-    if (!((idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : true))) {
-      row.hidden = true;
-      hiddenRows.push(row);
-      row.hidden = true;
+    if (operator === "OR") {
+      if (!((idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) || (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : true))) {
+        row.hidden = true;
+        hiddenRows.push(row);
+        row.hidden = true;
+      }
+    } else {  // operator === "AND"
+      if (!((idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : true))) {
+        row.hidden = true;
+        hiddenRows.push(row);
+        row.hidden = true;
+      }
     }
   });
+}
+
+function filterMsgTable() {
+  let operator = document.querySelector('input[name="table-all-filter-operator"]:checked').value;
+  let rowArray = Array.from(messageTableBody.children);
+  // used in determining whether to hide a row
+  const idFilterExists = filters.by_id.length > 0;
+  const dataFilterExists = filters.by_data_value.length > 0;
+
+  /* Filters messages for the table that displays ALL messages. In this table, messages will be
+  filtered by ID (or its label), data field value, and time step. The count filter is not applicable
+  to this table since it does not display message counts (that is what the other table is for).
+  */
+  rowArray.forEach(row => {
+    if (operator === 'OR') {
+      if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
+            filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) ||
+          (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : true))) {
+        row.hidden = true;
+        hiddenRows.push(row);
+      }
+    } else { // operator === 'AND'
+      if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
+            filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) &&
+          (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : true))) {
+        row.hidden = true;
+        hiddenRows.push(row);
+      }
+    }
+
+  });
+}
+
+function clearCountTableFilters() {
+  countHiddenRows.forEach(row => {
+    row.hidden = false;
+  });
+
+  // setting length == 0 clears the list
+  countHiddenRows.length = 0;
+  countTableFilters.by_id.length = 0;
+  countTableFilters.by_msg_freq.length = 0;
+}
+
+function clearMsgTableFilters() {
+  msgHiddenRows.forEach(row => {
+    row.hidden = false;
+  });
+
+  // setting length == 0 clears the list
+  msgHiddenRows.length = 0;
+  msgTableFilters.by_id.length = 0;
+  msgTableFilters.by_msg_freq.length = 0;
 }
 
 function clearFilters() {
