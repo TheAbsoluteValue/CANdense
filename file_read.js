@@ -421,6 +421,9 @@ function updateMessageTableFilters() {
   idFilter = document.getElementById('table-all-id-filter');
   dataValFilter = document.getElementById('table-all-data-val-filter');
 
+  // don't want previous filters to persist
+  clearMsgTableFilters();
+
   if (idFilter.value) {
     // split on space, or comma, or both
     msgTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
@@ -487,8 +490,8 @@ function filterMsgTable() {
   }
   let rowArray = Array.from(messageTableBody.children);
   // used in determining whether to hide a row
-  const idFilterExists = filters.by_id.length > 0;
-  const dataFilterExists = filters.by_data_value.length > 0;
+  const idFilterExists = msgTableFilters.by_id.length > 0;
+  const dataFilterExists = msgTableFilters.by_data_value.length > 0;
 
   /* Filters messages for the table that displays ALL messages. In this table, messages will be
   filtered by ID (or its label), data field value, and time step. The count filter is not applicable
@@ -497,8 +500,8 @@ function filterMsgTable() {
   rowArray.forEach(row => {
       if (!operator(
           (idFilterExists ? msgTableFilters.by_id.includes(row.firstChild.textContent) ||
-            filters.by_id.includes(row.firstChild.classList[1].textContent) : defaultTruthy),
-        (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : defaultTruthy))) {
+            msgTableFilters.by_id.includes(row.firstChild.classList[1].textContent) : defaultTruthy),
+        (dataFilterExists ? msgTableFilters.by_data_value.includes(row.children[1].textContent) : defaultTruthy))) {
       row.hidden = true;
       msgTableHiddenRows.push(row);
     }
@@ -524,7 +527,7 @@ function clearMsgTableFilters() {
   // setting length == 0 clears the list
   msgTableHiddenRows.length = 0;
   msgTableFilters.by_id.length = 0;
-  msgTableFilters.by_msg_freq.length = 0;
+  msgTableFilters.by_data_value.length = 0;
 }
 
 /* Given a list of integers, returns a new list that contains all the original numbers as well as
