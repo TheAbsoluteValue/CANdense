@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 
+global.mode = {prop1: process.argv};
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
