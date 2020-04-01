@@ -3,7 +3,7 @@ const fs = require('fs');
 
 // the point at which we will append a row for each message
 const messageTableBody = document.getElementById("message-table-body");
-let countTableBody;
+let countTableBody; // will be created after all messages are read
 
 let os = getOS(); // string name of the OS which is used for file loading
 let fileOptions; // list of the files the user can read in
@@ -24,11 +24,11 @@ const msgTableFilters = {
   by_id: [],
   by_data_value: []
 }
-const countHiddenRows = [] // list of rows of the count table hidden by filter; makes unhdiding easy
-const msgHiddenRows = [] // list of rows of all message table hidden by filter;
-                         // makes unhiding easier
-let countIdFilter;  // for the count table
-let freqFilter;  // for the count table
+const countTableHiddenRows = [] // list of rows of the count table hidden by filter; makes unhdiding easy
+const msgTableHiddenRows = [] // list of rows of all message table hidden by filter;
+// makes unhiding easier
+let countIdFilter; // for the count table
+let freqFilter; // for the count table
 let freqTolerance; // for the count table
 let msgIdFilter; // for the table with all messages
 let dataValFilter; // for the table with all messages
@@ -138,16 +138,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // for updating filters
-  document.getElementById('apply-filter-btn').addEventListener('click', () => {
-    updateFilters();
-    filterTables();
+  // for count table
+  document.getElementById('table-count-apply-filter-btn').addEventListener('click', () => {
+    updateCountTableFilters();
+    filterCountTable();
   });
 
-  // for clearing filters
-  document.getElementById('clear-filter-btn').addEventListener('click', () => {
-    clearFilters();
+  // for count table
+  document.getElementById('table-count-clear-filter-btn').addEventListener('click', () => {
+    clearCountTableFilters();
   });
+});
+
+// for table with all messages
+document.getElementById('table-all-apply-filter-btn').addEventListener('click', () => {
+  updateMessageTableFilters();
+  filterMsgTable();
+});
+
+// for table with all messages
+document.getElementById('table-all-clear-filter-btn').addEventListener('click', () => {
+  clearMsgTableFilters();
 });
 
 // creates the table to show user how many times messages of each ID occurred
@@ -387,44 +398,55 @@ function massTableUpdate() {
 }
 
 /* Filters */
-function updateFilters() {
-  timeFilter = document.getElementById('time-filter');
-  idFilter = document.getElementById('id-filter');
-  msgFreqFilter = document.getElementById('msg-freq-filter');
-  msgFreqTolerance = document.getElementById('msg-freq-tolerance');
-  dataValFilter = document.getElementById('data-val-filter');
+function updateCountTableFilters() {
+  idFilter = document.getElementById('table-count-id-filter');
+  msgFreqFilter = document.getElementById('table-count-freq-filter');
+  msgFreqTolerance = document.getElementById('table-count-freq-tolerance');
 
   // don't want previous filters to persist
-  clearFilters();
+  clearCountTableFilters();
 
-  // // TODO: not sure how this would work for file reading
-  // if (timeFilter.value) {
-  // }
-
-  // TODO: should we do this just by numeric ID, or by label as well?
   if (idFilter.value) {
     // split on space, or comma, or both
-    filters.by_id = idFilter.value.split(/[\s|,]+/);
+    countTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
   }
 
   if (msgFreqFilter.value) {
     let frequencies = msgFreqFilter.value.split(/[\s|,]+/).map(Number);
-    filters.by_msg_freq = frequencies;
+    countTableFilters.by_msg_freq = frequencies;
+  }
+}
+
+function updateMessageTableFilters() {
+  idFilter = document.getElementById('table-all-id-filter');
+  dataValFilter = document.getElementById('table-all-data-val-filter');
+
+  if (idFilter.value) {
+    // split on space, or comma, or both
+    msgTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
   }
 
   if (dataValFilter.value) {
-    filters.by_data_value = dataValFilter.value.split(/[\s|,]+/);
+    msgTableFilters.by_data_value = dataValFilter.value.split(/[\s|,]+/);
   }
 }
 
 function filterCountTable() {
   let operator = document.querySelector('input[name="table-count-filter-operator"]:checked').value;
+  let defaultTruthy; // used in the conditions where the filter doesn't exist
+  if (operator === "OR") {
+    operator = logicalOr;
+    defaultTruthy = false;
+  } else {
+    operator = logicalAnd;
+    defaultTruthy = true;
+  }
   // Array is more easily iterated through than HTMLcollection
   let rowArray = Array.from(countTableBody.children);
   const idFilterExists = countTableFilters.by_id.length > 0;
   const frequencyFilterExists = countTableFilters.by_msg_freq.length > 0;
-  const frequencyToleranceExists = Boolean(msgFreqTolerance.value); f
-  let frequencyValues = filters.by_msg_freq;
+  const frequencyToleranceExists = Boolean(msgFreqTolerance.value);
+  let frequencyValues = countTableFilters.by_msg_freq;
   if (frequencyToleranceExists) {
     frequencyValues = generateRanges(frequencyValues, Number(msgFreqTolerance.value));
   }
@@ -444,24 +466,25 @@ function filterCountTable() {
     If the user has entered a frequency (count) filter, then we check to see if the row indicates
     the proper number of occurrences. Obviously, if it doesn't the row is hidden.
     */
-    if (operator === "OR") {
-      if (!((idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) || (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : true))) {
-        row.hidden = true;
-        hiddenRows.push(row);
-        row.hidden = true;
-      }
-    } else {  // operator === "AND"
-      if (!((idFilterExists ? filters.by_id.includes(row.firstChild.textContent) : true) && (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : true))) {
-        row.hidden = true;
-        hiddenRows.push(row);
-        row.hidden = true;
-      }
+    if (!operator(
+        (idFilterExists ? countTableFilters.by_id.includes(row.firstChild.textContent) : defaultTruthy),
+        (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : defaultTruthy))) {
+      row.hidden = true;
+      countTableHiddenRows.push(row);
     }
   });
 }
 
 function filterMsgTable() {
   let operator = document.querySelector('input[name="table-all-filter-operator"]:checked').value;
+  let defaultTruthy; // used in the conditions where the filter doesn't exist
+  if (operator === "OR") {
+    operator = logicalOr;
+    defaultTruthy = false;
+  } else {
+    operator = logicalAnd;
+    defaultTruthy = true;
+  }
   let rowArray = Array.from(messageTableBody.children);
   // used in determining whether to hide a row
   const idFilterExists = filters.by_id.length > 0;
@@ -472,58 +495,36 @@ function filterMsgTable() {
   to this table since it does not display message counts (that is what the other table is for).
   */
   rowArray.forEach(row => {
-    if (operator === 'OR') {
-      if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
-            filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) ||
-          (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : true))) {
-        row.hidden = true;
-        hiddenRows.push(row);
-      }
-    } else { // operator === 'AND'
-      if (!((idFilterExists ? (filters.by_id.includes(row.firstChild.textContent) ||
-            filters.by_id.includes(row.firstChild.classList[1].textContent)) : true) &&
-          (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : true))) {
-        row.hidden = true;
-        hiddenRows.push(row);
-      }
+      if (!operator(
+          (idFilterExists ? msgTableFilters.by_id.includes(row.firstChild.textContent) ||
+            filters.by_id.includes(row.firstChild.classList[1].textContent) : defaultTruthy),
+        (dataFilterExists ? filters.by_data_value.includes(row.children[1].textContent) : defaultTruthy))) {
+      row.hidden = true;
+      msgTableHiddenRows.push(row);
     }
-
   });
 }
 
 function clearCountTableFilters() {
-  countHiddenRows.forEach(row => {
+  countTableHiddenRows.forEach(row => {
     row.hidden = false;
   });
 
   // setting length == 0 clears the list
-  countHiddenRows.length = 0;
+  countTableHiddenRows.length = 0;
   countTableFilters.by_id.length = 0;
   countTableFilters.by_msg_freq.length = 0;
 }
 
 function clearMsgTableFilters() {
-  msgHiddenRows.forEach(row => {
+  msgTableHiddenRows.forEach(row => {
     row.hidden = false;
   });
 
   // setting length == 0 clears the list
-  msgHiddenRows.length = 0;
+  msgTableHiddenRows.length = 0;
   msgTableFilters.by_id.length = 0;
   msgTableFilters.by_msg_freq.length = 0;
-}
-
-function clearFilters() {
-  hiddenRows.forEach(row => {
-    row.hidden = false;
-  });
-
-  // setting length == 0 clears the list
-  hiddenRows.length = 0;
-  filters.by_id.length = 0;
-  filters.by_time.length = 0;
-  filters.by_msg_freq.length = 0;
-  filters.by_data_value.length = 0;
 }
 
 /* Given a list of integers, returns a new list that contains all the original numbers as well as
@@ -534,14 +535,25 @@ Used when a tolerance is specified in the message frequency filter
 function generateRanges(list, deviation) {
   let r = [];
   list.forEach(num => {
-    var startVal = num - deviation >= 0 ? num - deviation : 0;  // prevent from generating neg. num
+    var startVal = num - deviation >= 0 ? num - deviation : 0; // prevent from generating neg. num
     var endVal = num + deviation;
     for (i = startVal; i <= endVal; i++) {
-      if (!r.includes(i)) {r.push(i);}
+      if (!r.includes(i)) {
+        r.push(i);
+      }
     }
   });
 
   return r;
+}
+
+// used for filtering logic
+function logicalAnd(condition1, condition2) {
+  return condition1 && condition2
+}
+
+function logicalOr(condition1, condition2) {
+  return condition1 || condition2;
 }
 
 // use navigator to figure out which OS you are on, useful for file directory stuff
