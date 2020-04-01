@@ -10,10 +10,6 @@ body {
     background: #2B60DE;
 }
 
-#centerAlign {
-    text-align: center;
-}
-
 .navbar-link {
     color: white;
 }
@@ -52,10 +48,6 @@ a:hover {
 
 .input-small {
   width: 40%;
-}
-
-#centerAlign div {
-  display: inline-block;
 }
 
 table, th, td {

@@ -9,100 +9,130 @@
 </head>
 
 <body>
-  <div id="centerAlign">
-    <nav id="navbar">
-      <ul class="list-inline">
-        <li class="list-inline-item">
-          <a href="live_read.html" class="navbar-link">Live Read</a>
-        </li>
-        <li class="list-inline-item">
-          <a href="file_read.html" class="navbar-link">File Read</a>
-        </li>
-        <li class="list-inline-item">
-          <a href="transmit.html" class="navbar-link">Transmit</a>
-        </li>
-        <li class="list-inline-item">
-          <a href="settings.html" class="navbar-link">Settings</a>
-        </li>
-      </ul>
-    </nav>
-    <hr id="navbar-rule">
-
-    <!-- DOM elements relevant to selecting the log file to read -->
-    <label id="logfile-label">Log file<br><select type="file" id="logfile-path-dropdown" onChange="logFileSelectionChanged(event)"></select></label>
-
-    <button id="read-btn">Read</button>
-    <br>
-
-
-    <div class="root-div">
-      <div>
-        <h5>Vehicle Profile</h5>
-      </div> <br>
-      <div class="horizontal-container">
-        <div class="horizontal-5050-div">
-          <!-- DOM elements relevant to selecting vehicle profile -->
-          <label id="vehicle-profile-label">Vehicle <br>
-            <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select></label>
-          <br>
-          <button id="add-vehicle-btn">+</button>
-          <br>
-        </div>
-        <div class="horizontal-5050-div">
-          <!-- DOM elements relevant to adding labels to IDs -->
-          <div>
-            <label for="id-input">ID<br><input type="text" id="id-input" name="id-input" length=3></label>
-          </div>
-          <div>
-            <label for="label-input">Label<br><input type="text" id="label-input" name="label-input" length=16></label> <br>
-            <button id="add-label-btn">Add ID label</button>
-          </div>
-        </div>
+  <div class="container justify-content-center">
+    <!-- Navbar -->
+    <div class="row">
+      <div class="col-12">
+        <nav id="navbar">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <a href="live_read.html" class="navbar-link">Live Read</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="file_read.html" class="navbar-link">File Read</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="transmit.html" class="navbar-link">Transmit</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="settings.html" class="navbar-link">Settings</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <hr id="navbar-rule">
       </div>
     </div>
 
-    <!-- DOM elements for filtering -->
-    <div class="root-div">
-      <div>
-        <h5>Count Table Filters</h5>
-        <div class="horizontal-container">
-          <div class="horizontal-5050-div">
-            <label for="table-count-id-filter">ID <br><input type="text" name="table-count-id-filter" id="table-count-id-filter"></label>
-            <br><br>
-            <div>
-              <label>OR <input type="radio" value="OR" name="table-count-filter-operator" checked></label>
-              <label>AND <input type="radio" value="AND" name="table-count-filter-operator"></label>
+    <!-- Log file selection -->
+    <div class="row">
+      <div class="col-12">
+        <label id="logfile-label">Log file<br><select type="file" id="logfile-path-dropdown" onChange="logFileSelectionChanged(event)"></select></label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <button id="read-btn">Read</button>
+      </div>
+    </div>
+
+    <!-- Vehicle profile -->
+    <div class="row">
+      <div class="col-12">
+        <div class="root-div">
+          <div>
+            <h5>Vehicle Profile</h5>
+          </div> <br>
+          <div class="horizontal-container">
+            <div class="horizontal-5050-div">
+              <label id="vehicle-profile-label">Vehicle <br>
+                <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select></label>
+              <br>
+              <button id="add-vehicle-btn">+</button>
+              <br>
+            </div>
+            <div class="horizontal-5050-div">
+              <!-- DOM elements relevant to adding labels to IDs -->
+              <div>
+                <label for="id-input">ID<br><input type="text" id="id-input" name="id-input" length=3></label>
+              </div>
+              <div>
+                <label for="label-input">Label<br><input type="text" id="label-input" name="label-input" length=16></label> <br>
+                <button id="add-label-btn">Add ID label</button>
+              </div>
             </div>
           </div>
-          <div class="horizontal-5050-div">
-            <label for="table-count-freq-filter">ID Frequency<br><input type="number" name="table-count-freq-filter" id="table-count-freq-filter"></label>
-            <label for="msg-freq-tolerance">Frequency Tolerance <br><input type="number" name="table-count-msg-freq-tolerance" id="table-count-freq-tolerance" class="input-small"></label>
-          </div>
-          <br>
         </div>
-        <button id="table-count-apply-filter-btn">Filter</button>
-        <button id="table-count-clear-filter-btn">Clear</button>
       </div>
     </div>
 
-  <div class="root-div">
-    <div>
-      <h5>All Message Filters</h5>
-      <div class="horizontal-container">
-        <div class="horizontal-5050-div">
-          <label for="table-all-id-filter">ID <br><input type="text" name="table-all-id-filter" id="table-all-id-filter"></label>
-        </div>
-        <div class="horizontal-5050-div">
-          <label for="table-all-data-val-filter">Data Field <br><input type="text" name="table-all-data-val-filter" id="table-all-data-val-filter"></label>
+    <!-- Count table filter settings -->
+    <div class="row">
+      <div class="col-12">
+        <!-- DOM elements for filtering -->
+        <div class="root-div">
+          <div>
+            <h5>Count Table Filters</h5>
+            <div class="horizontal-container">
+              <div class="horizontal-5050-div">
+                <label for="table-count-id-filter">ID <br><input type="text" name="table-count-id-filter" id="table-count-id-filter"></label>
+                <br><br>
+                <div>
+                  <label>OR <input type="radio" value="OR" name="table-count-filter-operator" checked></label>
+                  <label>AND <input type="radio" value="AND" name="table-count-filter-operator"></label>
+                </div>
+              </div>
+              <div class="horizontal-5050-div">
+                <label for="table-count-freq-filter">ID Frequency<br><input type="number" name="table-count-freq-filter" id="table-count-freq-filter"></label>
+                <label for="msg-freq-tolerance">Frequency Tolerance <br><input type="number" name="table-count-msg-freq-tolerance" id="table-count-freq-tolerance" class="input-small"></label>
+              </div>
+              <br>
+            </div>
+            <button id="table-count-apply-filter-btn">Filter</button>
+            <button id="table-count-clear-filter-btn">Clear</button>
+          </div>
         </div>
       </div>
-      <div>
-        <label>OR <input type="radio" value="OR" name="table-all-filter-operator" checked></label>
-        <label>AND <input type="radio" value="AND" name="table-all-filter-operator"></label> <br>
-      </div>
-      <button id="table-all-apply-filter-btn">Filter</button>
-      <button id="table-all-clear-filter-btn">Clear</button>
     </div>
+
+    <!-- All message table filter setting -->
+    <div class="row">
+      <div class="col-12">
+        <div class="root-div">
+          <div>
+            <h5>All Message Filters</h5>
+            <div class="horizontal-container">
+              <div class="horizontal-5050-div">
+                <label for="table-all-id-filter">ID <br><input type="text" name="table-all-id-filter" id="table-all-id-filter"></label>
+              </div>
+              <div class="horizontal-5050-div">
+                <label for="table-all-data-val-filter">Data Field <br><input type="text" name="table-all-data-val-filter" id="table-all-data-val-filter"></label>
+              </div>
+            </div>
+            <div>
+              <label>OR <input type="radio" value="OR" name="table-all-filter-operator" checked></label>
+              <label>AND <input type="radio" value="AND" name="table-all-filter-operator"></label> <br>
+            </div>
+            <button id="table-all-apply-filter-btn">Filter</button>
+            <button id="table-all-clear-filter-btn">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- table to display counts of each ID -->
