@@ -30,6 +30,9 @@ if(mode && mode == 'test') {
   // Read the input file "fake car"
   var logFile = fs.createReadStream(TEST_LOG_PATH);
 }
+else {
+  console.log("Write the code for finding the pathToPort you ninny, if you are Steven. If you are someone else, you are very intelligent and I am sorry that that ninny never wrote the code. That ninny is I, Steven Angel.")
+}
 
 //Create the Port and Parser, and Pipe them together
 const port = new SerialPort(pathToPort);
