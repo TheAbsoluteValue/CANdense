@@ -31,15 +31,24 @@ if(mode && mode == 'test') {
   var logFile = fs.createReadStream(TEST_LOG_PATH);
 }
 else {
-  console.log("Write the code for finding the pathToPort you ninny, if you are Steven. If you are someone else, you are very intelligent and I am sorry that that ninny never wrote the code. That ninny is I, Steven Angel.")
+  SerialPort.list().then(ports => { // This will list all devices and filter the microcontroller
+  const myList = ports.filter(port => port.manufacturer === "Silicon Labs");
+
+    if (!myList.length)
+        return console.log("Device not found");
+    new SerialPort(myList[0].path).pipe(new parsers.Readline({ 
+      delimiter: '\r\n',
+    }));
+  });
+  console.log("Write the code for finding the pathToPort you ninny, if you are Steven. If you are someone else, you are very intelligent and I am sorry that that ninny never wrote the code. That ninny is I, Steven Angel.");
 }
 
 //Create the Port and Parser, and Pipe them together
-const port = new SerialPort(pathToPort);
-const parser = new parsers.Readline({ 
-  delimiter: '\r\n', //Readline Parser delimited on "carriage return newline" characters 
-});
-port.pipe(parser);
+// const port = new SerialPort(pathToPort);
+// const parser = new parsers.Readline({ 
+//   delimiter: '\r\n', //Readline Parser delimited on "carriage return newline" characters 
+// });
+// port.pipe(parser);
 
 /*
 ==============================================================================================================
