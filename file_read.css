@@ -53,4 +53,11 @@ a:hover {
 
 table, th, td {
   border: 2px solid black
-}
+  }
+  tr:nth-child(odd) { 
+    background-color: white; 
+  } 
+  tr:nth-child(even) { 
+    background-color: rgb(238, 224, 144); 
+  } 
+

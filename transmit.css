@@ -26,6 +26,7 @@ label {
     display: inline-block;
     width: 200px;
     text-align: -webkit-auto;
+    text-decoration-style: bold;
 }
 
 .navbar-link {
