@@ -50,11 +50,11 @@
     </div>
 
     <!-- Vehicle profile -->
-    <div class="row">
-      <div class="col-12 d-flex justify-content-center">
+    <div class="row justify-content-center">
+      <div class="col-md-auto">
         <div class="root-div">
           <div>
-            <h5>Vehicle Profile</h5>
+            <h5 class="center">Vehicle Profile</h5>
           </div> <br>
           <div class="horizontal-container">
             <div class="horizontal-5050-div">
@@ -66,25 +66,24 @@
             </div>
             <div class="horizontal-5050-div">
               <!-- DOM elements relevant to adding labels to IDs -->
-              <div>
                 <label for="id-input">ID<br><input type="text" id="id-input" name="id-input" length=3></label>
-              </div>
-              <div>
                 <label for="label-input">Label<br><input type="text" id="label-input" name="label-input" length=16></label> <br>
                 <button id="add-label-btn">Add ID label</button>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+  <!-- table to display counts of each ID -->
+  <div id="CanMessageTables" hidden>
+    <h3 class="customHeader"align="center">Number of Messages by ID</h3><br>
     <!-- Count table filter settings -->
-    <div class="row">
-      <div class="col-12 d-flex justify-content-center">
+    <div class="row justify-content-center">
+      <div class="col-md-auto">
         <!-- DOM elements for filtering -->
-        <div class="root-div justify-content-center">
-            <h5>Count Table Filters</h5>
+        <div class="root-div">
+            <h5 class="center">Count Filter</h5>
             <div class="horizontal-container">
               <div class="horizontal-5050-div">
                 <label for="table-count-id-filter">ID <br><input type="text" name="table-count-id-filter" id="table-count-id-filter"></label>
@@ -100,48 +99,19 @@
               </div>
               <br>
             </div>
-            <button id="table-count-apply-filter-btn">Filter</button>
-            <button id="table-count-clear-filter-btn">Clear</button>
+            <div class="center">
+              <button id="table-count-apply-filter-btn">Filter</button>
+              <button id="table-count-clear-filter-btn">Clear</button>
+            </div>
         </div>
       </div>
     </div>
-
-    <!-- All message table filter setting -->
-    <div class="row">
-      <div class="col-12 d-flex justify-content-center">
-        <div class="root-div">
-          <div>
-            <h5>All Message Filters</h5>
-            <div class="horizontal-container">
-              <div class="horizontal-5050-div">
-                <label for="table-all-id-filter">ID <br><input type="text" name="table-all-id-filter" id="table-all-id-filter"></label>
-              </div>
-              <div class="horizontal-5050-div">
-                <label for="table-all-data-val-filter">Data Field <br><input type="text" name="table-all-data-val-filter" id="table-all-data-val-filter"></label>
-              </div>
-            </div>
-            <div>
-              <label>OR <input type="radio" value="OR" name="table-all-filter-operator" checked></label>
-              <label>AND <input type="radio" value="AND" name="table-all-filter-operator"></label> <br>
-            </div>
-            <button id="table-all-apply-filter-btn">Filter</button>
-            <button id="table-all-clear-filter-btn">Clear</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- table to display counts of each ID -->
-  <div id="CanMessageTables" hidden>
-    <h3 class="customHeader"align="center">Number of Messages by ID</h3><br> 
     <div id="count-table-container" class="customTable">
       <table align="center">
         <thead>
           <tr>
-            <td class="tableHeader">ID</td>
-            <td class="tableHeader">Count</td>
+            <td class="tableHeader"><b>ID</b></td>
+            <td class="tableHeader"><b>Count</b></td>
           </tr>
         </thead>
         <tbody id="count-table-body">
@@ -153,6 +123,30 @@
 
     <!-- table to display all messages from the log file -->
     <h3 class="customHeader"align="center">Messages from CAN</h3>
+    <!-- All message table filter setting -->
+    <div class="row justify-content-center">
+      <div class="col-md-auto">
+        <div class="root-div">
+          <h5 class="center">Message Filter</h5>
+          <div class="horizontal-container">
+            <div class="horizontal-100-div">
+              <label for="table-all-id-filter">ID <br><input type="text" name="table-all-id-filter" id="table-all-id-filter"></label>
+              <label for="table-all-data-val-filter">Data Field <br><input type="text" name="table-all-data-val-filter" id="table-all-data-val-filter"></label>
+            </div><br><br>
+          </div>
+          <div class="center">
+            <label>OR <input type="radio" value="OR" name="table-all-filter-operator" checked></label>
+            <label>AND <input type="radio" value="AND" name="table-all-filter-operator"></label> <br>
+          </div>
+          <div class="center">
+            <button id="table-all-apply-filter-btn">Filter</button>
+            <button id="table-all-clear-filter-btn">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
     <div id="message-table-container" class="customTable" hidden>
       <table align="center">
         <thead>

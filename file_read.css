@@ -27,6 +27,7 @@ a:hover {
 /* contains .horizontal-container elements */
 .root-div {
   border: solid white;
+  margin: auto;
   margin-top: 20px;
   margin-bottom: 20px;
   padding: 15px;
@@ -40,10 +41,15 @@ a:hover {
 }
 
 .horizontal-5050-div {
-  float: left;
   display: inline-block;
   width: 50%;
-  text-align: left;
+  text-align: center;
+  padding: 10px;
+}
+
+.horizontal-100-div {
+  display: inline-block;
+  text-align: center;
   padding: 10px;
 }
 
@@ -60,4 +66,9 @@ table, th, td {
   tr:nth-child(even) { 
     background-color: rgb(175, 175, 175); 
   } 
+
+.center {
+  display: flex;
+  justify-content: center;
+}
 
