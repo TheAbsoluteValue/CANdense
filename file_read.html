@@ -9,11 +9,11 @@
 </head>
 
 <body>
-  <div class="container justify-content-center">
+  <div class="container">
     <!-- Navbar -->
     <div class="row">
       <div class="col-12">
-        <nav id="navbar">
+        <nav class="navbar justify-content-center">
           <ul class="list-inline">
             <li class="list-inline-item">
               <a href="live_read.html" class="navbar-link">Live Read</a>
@@ -39,12 +39,12 @@
 
     <!-- Log file selection -->
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 d-flex justify-content-center">
         <label id="logfile-label">Log file<br><select type="file" id="logfile-path-dropdown" onChange="logFileSelectionChanged(event)"></select></label>
       </div>
     </div>
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 d-flex justify-content-center">
         <button id="read-btn">Read</button>
       </div>
     </div>
