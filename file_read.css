@@ -58,6 +58,6 @@ table, th, td {
     background-color: white; 
   } 
   tr:nth-child(even) { 
-    background-color: rgb(238, 224, 144); 
+    background-color: rgb(175, 175, 175); 
   } 
 
