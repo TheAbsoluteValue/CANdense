@@ -3,28 +3,37 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="live_read.css">
+  <h3 id="customHeader">CanDense</h3>
 </head>
 
 <body style="text-align:center;">
-  <!-- The header and the navbar-->
-  <h3 id="customHeader">CanDense</h3>
-  <nav id="navbar">
-    <ul class="list-inline">
-      <li class="list-inline-item">
-        <a href="live_read.html" class="navbar-link" onclick="endPage()">Live Read</a>
-      </li>
-      <li class="list-inline-item">
-        <a href="file_read.html" class="navbar-link" onclick="endPage()">File Read</a>
-      </li>
-      <li class="list-inline-item">
-        <a href="transmit.html" class="navbar-link" onclick="endPage()">Transmit</a>
-      </li>
-      <li class="list-inline-item">
-        <a href="settings.html" class="navbar-link" onclick="endPage()">Settings</a>
-      </li>
-    </ul>
-  </nav>
-  <hr id="navbar-rule">
+    <!-- Navbar -->
+    <div class="row">
+      <div class="col-12">
+        <nav class="navbar justify-content-center">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <a href="live_read.html" class="navbar-link" onclick="endPage()">Live Read</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="file_read.html" class="navbar-link" onclick="endPage()">File Read</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="transmit.html" class="navbar-link" onclick="endPage()">Transmit</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="settings.html" class="navbar-link" onclick="endPage()">Settings</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <hr id="navbar-rule">
+      </div>
+    </div>
+
   <div class="column">
     <!-- DOM elements relevant to selecting vehicle profile -->
     <label id="vehicle-profile-label">Vehicle</label>
