@@ -8,6 +8,7 @@
 
 body {
     background: #2B60DE;
+    font-family: 'Roboto', sans-serif;
 }
 
 #centerAlign {
@@ -41,4 +42,9 @@ label {
 a:hover {
     color: #ffc107;
     text-decoration: underline;
+}
+
+h3 {
+    font-family: 'Corben', Georgia, Times, serif;
+    font-weight: bold;
 }

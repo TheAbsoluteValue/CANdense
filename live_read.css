@@ -8,6 +8,7 @@
 
 body {
     background: #2B60DE;
+    font-family: 'Roboto', sans-serif;
 }
 
 .navbar-link {
@@ -27,4 +28,13 @@ a:hover {
 .column {
     float: left;
     width: 50%;
+}
+
+h3 {
+    font-family: 'Corben', Georgia, Times, serif;
+    font-weight: bold;
+}
+  
+h4 {
+    font-weight: bold;
 }

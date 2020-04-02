@@ -8,6 +8,7 @@
 
 body {
     background: #2B60DE;
+    font-family: 'Roboto', sans-serif;
 }
 
 .navbar-link {
@@ -72,3 +73,11 @@ table, th, td {
   justify-content: center;
 }
 
+h3 {
+  font-family: 'Corben', Georgia, Times, serif;
+  font-weight: bold;
+}
+
+h4 {
+  font-weight: bold;
+}

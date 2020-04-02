@@ -13,6 +13,9 @@
    "dependencies": {
       "debug": "^4.1.1",
       "electron": "^7.1.13",
+      "install": "^0.13.0",
+      "jquery": "^3.4.1",
+      "jquery-backstretch": "^2.1.18",
       "serialport": "^8.0.7",
       "tableify": "^1.1.0"
    },
