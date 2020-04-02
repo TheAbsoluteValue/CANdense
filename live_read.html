@@ -25,52 +25,56 @@
     </ul>
   </nav>
   <hr id="navbar-rule">
+  <div class="column">
+    <!-- DOM elements relevant to selecting vehicle profile -->
+    <label id="vehicle-profile-label">Vehicle</label>
+    <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
+    <button id="add-vehicle-btn">+</button>
+    <!-- This button is used to start/pause receiving new messages -->
+    <button id="toggleReadBtn" onclick="toggleReadBtnPressed()">Start reading</button>
+    <br>
 
-  <!-- This button is used to start/pause receiving new messages -->
-  <button id="toggleReadBtn" onclick="toggleReadBtnPressed()">Start reading</button>
-  <br>
+    <!-- For setting the location to log to -->
+    <label for="logfile-path">Log file save location</label>
+    <input type="text" id="logfile-path" placeholder="path/to/logfile.log"></input>
+    <button onclick="setupLogger()" id="setLogPathBtn">Set log path</button>
+    <!-- For actually logging -->
+    <button id="toggleLogBtn" onclick="toggleLogBtnPressed()">Start Logging</button>
+    <button onclick="endLogger()">Save Logging</button>
+    <br>
 
-  <!-- For setting the location to log to -->
-  <label for="logfile-path">Log file save location</label>
-  <input type="text" id="logfile-path" placeholder="path/to/logfile.log">
-  <button onclick="setupLogger()" id="setLogPathBtn">Set log path</button>
-  <br>
+    <!-- DOM elements relevant to adding labels to IDs -->
+    <label for="id-input">ID</label>
+    <input type="text" id="id-input" name="id-input" length=3></input>
+    <label for="label-input">Label</label>
+    <input type="text" id="label-input" name="label-input" length=16></input>
+    <button id="add-label-btn">+</button>
+    <br>
 
-  <!-- For actually logging -->
-  <button id="toggleLogBtn" onclick="toggleLogBtnPressed()">Start Logging</button>
-  <button onclick="endLogger()">Save Logging</button>
-  <br>
-
-  <!-- DOM elements relevant to selecting vehicle profile -->
-  <label id="vehicle-profile-label">Vehicle</label>
-  <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
-  <button id="add-vehicle-btn">+</button>
-  <br>
-
-  <!-- DOM elements relevant to adding labels to IDs -->
-  <label for="id-input">ID</label>
-  <input type="text" id="id-input" name="id-input" length=3>
-  <label for="label-input">Label</label>
-  <input type="text" id="label-input" name="label-input" length=16>
-  <button id="add-label-btn">Add ID label</button>
-
-  <!-- DOM elements for filtering -->
-  <div>
+    <div id="table"></div>
+  </div>
+  <div class="column">
+    <!-- DOM elements for filtering -->
     <h3>Filters</h3>
-    <label for="time-filter">Time (ms)</label>
-    <input type="text" name="time-filter" id="time-filter">
     <label for="id-filter">ID</label>
-    <input type="text" name="id-filter" id="id-filter">
-    <div>
-      <label for="msg-freq-filter">ID Frequency</label>
-      <input type="text" name="msg-freq-filter" id="msg-freq-filter">
-      <label for="msg-freq-tolerance">Tolerance (optional)</label>
-      <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance">
-    </div>
+    <input type="text" name="id-filter" id="id-filter" width="20"></input>
+    <label for="msg-freq-filter">ID Frequency</label>
+    <input type="text" name="msg-freq-filter" id="msg-freq-filter"></input>
+    <label for="msg-freq-tolerance">Tolerance (optional)</label>
+    <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance"></input>
+    <br>
+
+    <label for="time-filter">Time (ms)</label>
+    <input type="text" name="time-filter" id="time-filter"></input>
     <label for="data-val-filter">Data Field</label>
-    <input type="text" name="data-val-filter" id="data-val-filter">
+    <input type="text" name="data-val-filter" id="data-val-filter"></input>
+    <br>
+
     <button id="apply-filter-btn">Filter</button>
     <button id="clear-filter-btn">Clear</button>
+    <br>
+
+    <div id="table2"></div>
   </div>
 
 </body>
