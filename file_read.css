@@ -10,10 +10,6 @@ body {
     background: #2B60DE;
 }
 
-#centerAlign {
-    text-align: center;
-}
-
 .navbar-link {
     color: white;
 }
@@ -28,34 +24,31 @@ a:hover {
     text-decoration: underline;
 }
 
+/* contains .horizontal-container elements */
+.root-div {
+  border: solid white;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 15px;
+  width: 80%;
+}
+
+/* contains .horizontal-5050-div elements */
+.horizontal-container {
+  display: flex;
+  text-align: center;
+}
+
 .horizontal-5050-div {
   float: left;
   display: inline-block;
   width: 50%;
-  text-align: center;
+  text-align: left;
   padding: 10px;
-}
-
-.horizontal-container {
-  display: flex;
-  padding: 15px;
-  text-align: center;
-}
-
-.root-div {
-  border: solid white;
-  width: 90%;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 15px;
 }
 
 .input-small {
   width: 40%;
-}
-
-#centerAlign div {
-  display: inline-block;
 }
 
 table, th, td {
