@@ -57,11 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let vehicleName = newVehicleInput.value;
         if (vehicleName) { // add the vehicle to JSON object
           vehiclesJSON[vehicleName] = {
-            vehicleName: {
               "received_ids": [],
               "labeled_ids": {},
               "notes": ""
-            }
           };
 
           // write the vehicle to vehicles.json

@@ -32,7 +32,7 @@
     <!-- DOM elements relevant to selecting vehicle profile -->
     <label id="vehicle-profile-label">Vehicle</label>
     <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
-    <button id="add-vehicle-btn">+</button>
+    <button id="add-vehicle-btn" onclick="showModal()"></button>+</button>
     <!-- Start/Pause the reading -->
     <button id="toggleReadBtn" onclick="toggleReadBtnPressed()">Start reading</button>
     <br>
@@ -52,12 +52,15 @@
     <input type="text" id="id-input" name="id-input" length="3" size="3"></input>
     <label for="label-input" title="A label of what an ID represents, eg. Speed, RPM, etc.">Label</label>
     <input type="text" id="label-input" name="label-input" length=16></input>
-    <button id="add-label-btn">+</button>
+    <button id="add-label-btn" onclick="addLabel()">+</button>
     <br>
 
-    <h3>Last Occurence</h3>
-    <!--Container for the table of last occurences-->
-    <div id="table"></div>
+    <!--Data-->
+    <div>
+      <h3>Messages</h3>
+      <!--Container for the table of last occurences-->
+      <div id="table"></div>
+    </div>
   </div>
 
   <!--Second Column-->
@@ -79,14 +82,29 @@
     <br>
 
     <!--Apply and clear fitlers-->
-    <button id="apply-filter-btn">Filter</button>
-    <button id="clear-filter-btn">Clear</button>
+    <button id="apply-filter-btn" onclick="filter()">Filter</button>
+    <button id="clear-filter-btn" onclick="clearFilter()">Clear</button>
     <br>
-    <br> <!--Two breaks to align the tables, not very effective, please help-->
+    <br>
 
-    <h3>All Data Values</h3>
-    <!--A table for displaying the different data values of each ID-->
-    <div id="table2"></div>
+    <!--Data-->
+    <div>
+      <h3>IDs</h3>
+      <!--Container for the table of ids and labels-->
+      <div id="tableID"></div>
+    </div>
+  </div>
+
+  
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <label for="vehicle-name">Enter a vehicle:</label>
+      <input type="text" name="vehicle-name" id="vehicle-name">
+      <button class="close" onclick="hideModal()">Enter</button>
+    </div>
   </div>
 
 </body>
