@@ -6,6 +6,7 @@
 </head>
 
 <body style="text-align:center;">
+  <div id="narrow-container">
   <!-- The header and the navbar-->
   <h3 id="customHeader">CanDense</h3>
   <nav id="navbar">
@@ -27,7 +28,8 @@
   <hr id="navbar-rule">
   
   <!--First Column-->
-  <div class="column">
+  <div class="row d-flex justify-content-center">
+    <div class="col-sm-6">
     <h3>Reading</h3>
     <!-- DOM elements relevant to selecting vehicle profile -->
     <label id="vehicle-profile-label">Vehicle</label>
@@ -62,9 +64,12 @@
       <div id="table"></div>
     </div>
   </div>
+  </div>
+  <br>
 
   <!--Second Column-->
-  <div class="column">
+  <div class="row d-flex justify-content-center">
+    <div class="col-sm-6">
     <!-- DOM elements for filtering -->
     <h3>Filters</h3>
     <label for="id-filter" title="A particular ID to search for">ID</label>
@@ -94,10 +99,12 @@
       <div id="tableID"></div>
     </div>
   </div>
+  </div>
 
   
 
   <!-- The Modal -->
+  <div class="row d-flex justify-content-center">
   <div id="myModal" class="modal">
     <!-- Modal content -->
     <div class="modal-content">
@@ -106,7 +113,8 @@
       <button class="close" onclick="hideModal()">Enter</button>
     </div>
   </div>
-
+</div>
+</div>
 </body>
 <script src="./live_read.js"></script>
 </html>
