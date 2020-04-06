@@ -2,21 +2,33 @@
     padding-top: 5px;
     padding-bottom: 15px;
     text-align: center;
-    color: white;
+    color: #2B60DE;;
     font-size: 30px;
 }
 
 body {
-    background: #2B60DE;
+    background-image: url('./assets/speedometer.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+    /* background: #2B60DE; */
     font-family: 'Roboto', sans-serif;
 }
 
+#narrow-container {
+    min-height: 100vh;
+    margin-left: 150px;
+    margin-right: 150px;
+    background-color: white;
+    opacity: 96%;
+}
+
 .navbar-link {
-    color: white;
+    color: #2B60DE;;
 }
 
 #navbar-rule {
-  border: 2.5px solid white;
+  border: 2.5px solid #2B60DE;
   border-radius: 1px;
 }
 
@@ -27,7 +39,7 @@ a:hover {
 
 /* contains .horizontal-container elements */
 .root-div {
-  border: solid white;
+  border: solid #2B60DE;
   margin: auto;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -80,4 +92,5 @@ h3 {
 
 h4 {
   font-weight: bold;
+  color: #2B60DE
 }
