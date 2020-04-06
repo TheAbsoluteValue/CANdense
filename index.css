@@ -4,13 +4,24 @@ use neither for entire page's tag. */
     padding-top: 5px;
     padding-bottom: 15px;
     text-align: center;
-    color: white;
+    color: #2B60DE;
     font-size: 30px;
 }
 
 body {
-    background: #2B60DE;
+    background-image: url('./assets/speedometer.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
     font-family: 'Roboto', sans-serif;
+}
+
+#narrow-container {
+    min-height: 100vh;
+    margin-left: 150px;
+    margin-right: 150px;
+    background-color: white;
+    opacity: 90%;
 }
 
 #centerAlign {
@@ -18,12 +29,12 @@ body {
 }
 
 .navbar-link {
-    color: white;
+    color: #2B60DE;
 }
 
 #navbar-rule {
-  border: 2.5px solid white;
-  border-radius: 1px;
+    border: 2.5px solid #2B60DE;
+    border-radius: 1px;
 }
 
 a:hover {
