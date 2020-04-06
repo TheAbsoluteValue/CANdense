@@ -9,10 +9,13 @@ const TEST_LOG_PATH = 'test_CANdump1.log'; //Path to the test input file represe
 
 //Holds the latest copy message of each unique id/label
 const messages = {};
+let labeledIDs = {};
+let selectedVehicle;
 //Files and locations
 let pathToPort = ' '; //empty pending which operating system
 let pathToLog; //Uninitialized pending call to setUplogging
-let fd;  // file descriptor, integer id representing the file returned by fs.openSync()
+let fdLog;  // file descriptor the log file, integer id representing the file returned by fs.openSync()
+let vehiclesJSON; //vehicles.json
 let logStream;  //output stream to pathToLog
 //Current state flags
 let isReading = false; 
@@ -21,6 +24,13 @@ let isFilterable = true; //False when live reading to prevent filters colliding 
 //Buttons!
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleLogBtn = document.getElementById('toggleLogBtn');
+let modal = document.getElementById("myModal");
+let vehicleNameIn = document.getElementById("vehicle-name");
+let vehicleDropDown = document.getElementById("vehicle-profile-name");
+let idInput = document.getElementById("id-input");
+let labelInput = document.getElementById("label-input");
+
+retrieveVehicles();
 
 //Check if this is testing or standard run
 if(mode && mode == 'test') {
@@ -43,18 +53,49 @@ else {
   });
 }
 
-//Create the Port and Parser, and Pipe them together
+//Create the Port and Parser, and set the on('data')
 const port = new SerialPort(pathToPort);
 const parser = new parsers.Readline({ 
   delimiter: '\r\n', //Readline Parser delimited on "carriage return newline" characters 
 });
-port.pipe(parser);
+parser.on('data', data => {process(data);});
 
 /*
 ==============================================================================================================
 --------------------------Reading-----------------------------------------------------------------------------
 ==============================================================================================================
 */
+
+//Process the incoming data into the two tables
+function process(data) {
+  //Split the line into its component parts
+  let dataSplit = data.toString().split(' '); //initial split
+  if(dataSplit[0].includes("READY")) {dataSplit[0] = dataSplit[0].slice(5);} //Scrub the emitted READY message from the CAN messages
+  let unixTimeStamp = dataSplit[0].slice(1, -1); //Gather the timestamp, slicing off the surrounding parentheses
+  let id = dataSplit[2].slice(0, 3); //Gather the id, first three characters of the data payload
+  let messageData = dataSplit[2].slice(4); //Gather the data, The rest of the data payload after the 4th character
+  
+  //Change timestamp from unixtime to hr:min:sec:ms
+  let date = new Date(parseFloat(unixTimeStamp));
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let seconds = date.getSeconds();
+  let milliseconds = date.getMilliseconds();
+  let timeString = [hours, minutes, seconds, milliseconds].join(':');
+
+  //Check if the ID has a label
+  id = labeledIDs[id] ? labeledIDs[id] : id;
+
+  //Gather the current count
+  let messageCount = messages[id] ? messages[id]["count"] : 0;
+
+  //Set the current message for the id whether a new id or refreshing an already seen id
+  messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
+
+  //Create the table and send to the HTML page
+  let messageHTML = tableify(messages);
+  document.getElementById("table").innerHTML = messageHTML;
+}
 
 //handle the toggle between reading and not reading
 function toggleReadBtnPressed() {
@@ -78,34 +119,7 @@ function startReading() {
   if(mode && mode == 'test') {
     logFile.pipe(port);
   }
-
-  //Sets what to do with each line read, data is a single line read in
-  parser.on('data', data => {
-    //Split the line into its component parts
-    let dataSplit = data.toString().split(' '); //initial split
-    if(dataSplit[0].includes("READY")) {dataSplit[0] = dataSplit[0].slice(5);} //Scrub the emitted READY message from the CAN messages
-    let unixTimeStamp = dataSplit[0].slice(1, -1); //Gather the timestamp, slicing off the surrounding parentheses
-    let id = dataSplit[2].slice(0, 3); //Gather the id, first three characters of the data payload
-    let messageData = dataSplit[2].slice(4); //Gather the data, The rest of the data payload after the 4th character
-    
-    //Change timestamp from unixtime to hr:min:sec:ms
-    let date = new Date(parseFloat(unixTimeStamp));
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let seconds = date.getSeconds();
-    let milliseconds = date.getMilliseconds();
-    let timeString = [hours, minutes, seconds, milliseconds].join(':');
-
-    //Gather the current count
-    let messageCount = messages[id] ? messages[id]["count"] : 0;
-
-    //Set the current message for the id whether a new id or refreshing an already seen id
-    messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
-
-    //Create the table and send to the HTML page
-    var messageHTML = tableify(messages);
-    document.getElementById("table").innerHTML = messageHTML;
-  });
+  port.pipe(parser);
 }
 
 //Called when the toggleReadBtn is clicked with isReading==true, make filterable and unpipe
@@ -141,16 +155,16 @@ function setUpLogger() {
   pathToLog = document.getElementById("logfile-path").value; //Grab the entered logFile Name
   if (!pathToLog) {pathToLog = `log\\CAN_${Date.now()}.log`;} //If no logFile name was entered
   if (!pathToLog.endsWith('.log')) {pathToLog = pathToLog.concat('.log');} //If there is no file ending entered or improper, add it
-  fd = fs.openSync(pathToLog, 'w'); // truncate
+  fdLog = fs.openSync(pathToLog, 'w'); // truncate
 }
 
 //Handles the writing and piping
 function startLogger() {
   isLogging = true;
   if (!logStream) { //Create the writeStream if there isn't one
-    logStream = fs.createWriteStream(null, {fd: fd});
+    logStream = fs.createWriteStream(null, {fdLog: fdLog});
     logStream.on('data', data => {
-      fs.writeFile(fd, data + "\n");
+      fs.writeFile(fdLog, data + "\n");
     });
   }
   parser.pipe(logStream); //pipe the parser to the writeStream
@@ -186,3 +200,93 @@ function endPage() {
 ==============================================================================================================
 */
 
+//Apply the users filters
+function filter() {
+  pauseReading();
+}
+
+//Set the table to be all data
+function clearFilter() {
+  let messageHTML = tableify(messages);
+  document.getElementById("table").innerHTML = messageHTML;
+}
+
+/*
+==============================================================================================================
+--------------------------labeling----------------------------------------------------------------------------
+==============================================================================================================
+*/
+
+//Retrieve the currently stored vehicles
+function retrieveVehicles() {
+  vehiclesJSON = JSON.parse(fs.readFileSync("vehicles.json"));
+  populateDropDown();
+  selectedVehicle = vehicleDropDown.options[vehicleDropDown.selectedIndex].value;
+  labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  //Create the table and send to the HTML page
+  let messageHTML = tableify(labeledIDs);
+  document.getElementById("tableID").innerHTML = messageHTML;
+}
+
+//Populate the vehicles drop down with currently stored vehicles
+function populateDropDown() {
+ let vehicleNames = Object.keys(vehiclesJSON);
+ vehicleNames.forEach(name => {vehicleDropDown.options.add(new Option(name));});
+}
+
+//handles the vehicle drop down selection changing
+function vehicleSelectionChanged(event) {
+  selectedVehicle = event.target.value;
+  labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  //Create the table and send to the HTML page
+  let messageHTML = tableify(labeledIDs);
+  document.getElementById("tableID").innerHTML = messageHTML;
+}
+
+//Add a label
+function addLabel() {
+  let id = idInput.value;
+  let label = labelInput.value;
+  vehiclesJSON[selectedVehicle]["labeled_ids"][id] = label;
+  fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
+  labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  messages[label] = {"id": label, "data": messages[id].data, "timestamp": messages[id].timestamp, "count": messages[id].count};
+  delete messages[id];
+  //Create the table and send to the HTML page
+  let messageHTML = tableify(messages);
+  document.getElementById("table").innerHTML = messageHTML;
+  //Create the table and send to the HTML page
+  let messageHTMLID = tableify(labeledIDs);
+  document.getElementById("tableID").innerHTML = messageHTMLID;
+}
+
+//Add the vehicle to the JSON file
+function addVehicle(name) {
+  vehicleDropDown.options.add(new Option(name));
+  vehiclesJSON[name] = {
+      "received_ids": [],
+      "labeled_ids": {},
+      "notes": ""
+  };
+  fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
+}
+
+//Open the Modal
+function showModal() {
+  modal.style.display = "block";
+}
+
+//Close the modal and enter the new vehicle
+function hideModal() {
+  addVehicle(vehicleNameIn.value);
+  vehicleNameIn.value = '';
+  modal.style.display = "none";
+
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
