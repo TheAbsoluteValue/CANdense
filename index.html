@@ -2,30 +2,39 @@
 <html>
 <head>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="index.css">
-
-<!-- make this drop-down select based on files for different makes? -->
-<h3 id="customHeader">CanDense</h3>
 </head>
 <body>
-	<div id="centerAlign">
-		<nav id="navbar">
-			<ul class="list-inline">
-				<li class="list-inline-item">
-					<a href="live_read.html" class="navbar-link">Live Read</a>
-				</li>
-				<li class="list-inline-item">
-					<a href="file_read.html" class="navbar-link">File Read</a>
-				</li>
-				<li class="list-inline-item">
-					<a href="transmit.html" class="navbar-link">Transmit</a>
-				</li>
-				<li class="list-inline-item">
-					<a href="settings.html" class="navbar-link">Settings</a>
-				</li>
-			</ul>
-		</nav>
-		<hr id="navbar-rule">
+  <div id="narrow-container">
+  <h3 id="customHeader">CanDense</h3>
+	<!-- Navbar -->
+  <div class="row">
+    <div class="col-12">
+      <nav class="navbar justify-content-center">
+        <ul class="list-inline">
+          <li class="list-inline-item">
+            <a href="live_read.html" class="navbar-link">Live Read</a>
+          </li>
+          <li class="list-inline-item">
+            <a href="file_read.html" class="navbar-link">File Read</a>
+          </li>
+          <li class="list-inline-item">
+            <a href="transmit.html" class="navbar-link">Transmit</a>
+          </li>
+          <li class="list-inline-item">
+            <a href="settings.html" class="navbar-link">Settings</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <hr id="navbar-rule">
+    </div>
+  </div>
 		<!-- <div id="centerAlign">
 		  <form action="live_read.html" class="IndexBtn">
 		    <input type="submit" value="Read live messages"/>
@@ -43,7 +52,7 @@
 		    <input type="submit" value="Settings">
 		  </form>
 		</div> -->
-	</div>
+  </div>
 </body>
 <!-- <script src="./renderer.js"></script> -->
 <!-- <script src="./filereader.js"></script> -->

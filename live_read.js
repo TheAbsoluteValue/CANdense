@@ -37,6 +37,7 @@ let toleranceInput = document.getElementById("msg-freq-tolerance");
 let timeInput = document.getElementById("time-filter");
 let dataInput = document.getElementById("data-val-filter");
 
+
 retrieveVehicles();
 
 //Check if this is testing or standard run
