@@ -2,6 +2,8 @@
 <html>
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="live_read.css">
 </head>
 
@@ -30,7 +32,7 @@
   <!--First Column-->
   <div class="row d-flex justify-content-center">
     <div class="col-sm-6">
-    <h3>Reading</h3>
+    <h4>Reading</h4>
     <!-- DOM elements relevant to selecting vehicle profile -->
     <label id="vehicle-profile-label">Vehicle</label>
     <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
@@ -59,7 +61,7 @@
 
     <!--Data-->
     <div>
-      <h3>Messages</h3>
+      <h4>Messages</h4>
       <!--Container for the table of last occurences-->
       <div id="table"></div>
     </div>
@@ -68,7 +70,7 @@
   <!--Second Column-->
     <div class="col-sm-6">
     <!-- DOM elements for filtering -->
-    <h3>Filters</h3>
+    <h4>Filters</h4>
     <label for="id-filter" title="A particular ID to search for">ID</label>
     <input type="text" name="id-filter" id="id-filter" size="2"></input>
     <label for="msg-freq-filter" title="Shows messages that occured this often">ID Frequency</label>
@@ -91,7 +93,7 @@
 
     <!--Data-->
     <div>
-      <h3>IDs</h3>
+      <h4>IDs</h4>
       <!--Container for the table of ids and labels-->
       <div id="tableID"></div>
     </div>

@@ -77,9 +77,18 @@ a:hover {
     font-weight: bold;
 }
   
-.close:hover,
-.close:focus {
+.close:hover, .close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
+}
+
+h3 {
+    font-family: 'Corben', Georgia, Times, serif;
+    font-weight: bold;
+}
+  
+h4 {
+    font-weight: bold;
+    color: #2B60DE
 }
