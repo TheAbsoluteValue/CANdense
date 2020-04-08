@@ -6,9 +6,11 @@ const parsers = SerialPort.parsers; //For the Port Parser
 var remote = require('electron').remote, arguments = remote.getGlobal('mode').prop1; //gather the mode (test or empty where emtpy is normal run)
 var mode = arguments[2];
 const TEST_LOG_PATH = 'test_CANdump1.log'; //Path to the test input file representing the Fake Car for the Mock Port
-
+let k = 0;
 //Holds the latest copy message of each unique id/label
 const messages = {};
+let dataValues = {};
+let filteredMessages = {};
 let labeledIDs = {};
 let selectedVehicle;
 //Files and locations
@@ -21,7 +23,7 @@ let logStream;  //output stream to pathToLog
 let isReading = false; 
 let isLogging = false; 
 let isFilterable = true; //False when live reading to prevent filters colliding with live data
-//Buttons!
+//Buttons and inputs!
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleLogBtn = document.getElementById('toggleLogBtn');
 let modal = document.getElementById("myModal");
@@ -29,6 +31,12 @@ let vehicleNameIn = document.getElementById("vehicle-name");
 let vehicleDropDown = document.getElementById("vehicle-profile-name");
 let idInput = document.getElementById("id-input");
 let labelInput = document.getElementById("label-input");
+let idFilterInput = document.getElementById("id-filter");
+let frequencyInput = document.getElementById("msg-freq-filter");
+let toleranceInput = document.getElementById("msg-freq-tolerance");
+let timeInput = document.getElementById("time-filter");
+let dataInput = document.getElementById("data-val-filter");
+
 
 retrieveVehicles();
 
@@ -91,6 +99,15 @@ function process(data) {
 
   //Set the current message for the id whether a new id or refreshing an already seen id
   messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
+  
+  if(!dataValues[id]) {
+    dataValues[id] = [messageData];
+  }
+  else {
+    if(dataValues[id].indexOf(messageData) == -1) {
+      dataValues[id].push(messageData);
+    }
+  }
 
   //Create the table and send to the HTML page
   let messageHTML = tableify(messages);
@@ -126,6 +143,9 @@ function startReading() {
 function pauseReading() {
   isReading = false;
   isFilterable = true; 
+  if (isLogging) {
+    pauseLogger();
+  }
   logFile.unpipe();
   port.unpipe();
 }
@@ -202,11 +222,60 @@ function endPage() {
 
 //Apply the users filters
 function filter() {
-  pauseReading();
+  if(!isFilterable) {
+    pauseReading();
+    isFilterable = true;
+  }
+  filteredMessages = {};
+  let currentTime = new Date();
+  let currentHours = currentTime.getHours();
+  let currentMinutes = currentTime.getMinutes();
+  let currentSeconds = currentTime.getSeconds();
+  let currentMillis = currentTime.getMilliseconds();
+  let idFilter = idFilterInput.value;
+  let freqFilter = Number.parseInt(frequencyInput.value);
+  let toleranceFilter = Number.parseInt(toleranceInput.value);
+  let timeFilter = Number.parseInt(timeInput.value);
+  let dataFilter = dataInput.value;
+
+  for (const id in messages) {
+    let message = messages[id];
+    let data = dataValues[id];
+    let date = message.timestamp.split(":");
+    let count = message.count;
+    let timeDifference = (currentHours - date[0]) * 3600 + (currentMinutes - date[1]) * 60 + (currentSeconds - date[2]) + (currentMillis - date[3]) / 100; 
+
+    if(!idFilter || idFilter == id) {
+      if(!freqFilter) {
+        if(!dataFilter || data.indexOf(dataFilter) != -1) {
+          if(!timeFilter || timeDifference < timeFilter) {
+            filteredMessages[id] = message;
+          }
+        }
+      }
+      else if(!toleranceFilter && freqFilter == count){
+        if(!dataFilter || data.indexOf(dataFilter) != -1) {
+          if(!timeFilter || timeDifference < timeFilter) {
+            filteredMessages[id] = message;
+          }
+        }
+      }
+      else if(count <= freqFilter + toleranceFilter &&  count >= freqFilter - toleranceFilter) {
+        if(!dataFilter || data.indexOf(dataFilter) != -1) {
+          if(!timeFilter || timeDifference < timeFilter) {
+            filteredMessages[id] = message;
+          }
+        }
+      }
+    }//End ifs
+    let messageHTML = tableify(filteredMessages);
+    document.getElementById("table").innerHTML = messageHTML;
+  }
 }
 
 //Set the table to be all data
 function clearFilter() {
+  filteredMessages = {};
   let messageHTML = tableify(messages);
   document.getElementById("table").innerHTML = messageHTML;
 }
@@ -252,6 +321,9 @@ function addLabel() {
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
   messages[label] = {"id": label, "data": messages[id].data, "timestamp": messages[id].timestamp, "count": messages[id].count};
   delete messages[id];
+  dataValues[label] = dataValues[id];
+  delete dataValues[id];
+  labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
   //Create the table and send to the HTML page
   let messageHTML = tableify(messages);
   document.getElementById("table").innerHTML = messageHTML;
