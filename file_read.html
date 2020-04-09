@@ -27,9 +27,6 @@
             <li class="list-inline-item">
               <a href="transmit.html" class="navbar-link">Transmit</a>
             </li>
-            <li class="list-inline-item">
-              <a href="settings.html" class="navbar-link">Settings</a>
-            </li>
           </ul>
         </nav>
       </div>
@@ -49,6 +46,7 @@
     <div class="row">
       <div class="col-12 d-flex justify-content-center">
         <button id="read-btn">Read</button>
+        <button id="clear-everything-btn">Clear</button>
       </div>
     </div>
 
@@ -110,8 +108,9 @@
       </div>
     </div>
     <div id="count-table-container" class="customTable">
+      <p id="counting-msg" align="center" hidden>Counting...</p>
       <table align="center">
-        <thead>
+        <thead id="count-thead">
           <tr>
             <td class="tableHeader"><b>ID</b></td>
             <td class="tableHeader"><b>Count</b></td>
@@ -149,7 +148,7 @@
       </div>
     </div>
 
-  </div>
+
     <div id="message-table-container" class="customTable" hidden>
       <table align="center">
         <thead>
@@ -164,9 +163,7 @@
         </tbody>
       </table>
     </div>
-
-    <!-- make this user input -->
-    <p id="notes" class="customNotes"></p>
+  </div>
   </div>
 </body>
 <script src="./file_read.js"></script>

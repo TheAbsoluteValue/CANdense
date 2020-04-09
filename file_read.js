@@ -12,6 +12,7 @@ let vehiclesJSON; // vehicles.json parsed as an object
 let vehicleDropdown; // dropdown user can select vehicle profile from
 let selectedVehicle = "None"; // name of the vehicle the user has selected
 let labeledIDs = {}; // object holding labeled IDs
+let labelsExist = false; // whether there are labels for the selected vehicle
 const idCounts = {}; // the count of each message (used in count table)
 let tablesDrawn = false; // whether both tables are drawn
 // to filter the count table's rows by various parameters
@@ -96,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  document.getElementById('clear-everything-btn').addEventListener('click', clearAllTables);
+
   /*
   Allows user to add a vehicle to the list of vehicles. Also adds that vehicle to the
   vehicles.config JSON file.
@@ -170,18 +173,17 @@ function createCountTable(idCounts) {
       let newRow = document.createElement("tr");
       let id = item[0];
 
+      // just creating the HTML elements
+      let idTd = document.createElement("td"); // holds the ID or label
+      idTd.className = "string";
+      idTd.setAttribute("id", id);
       // check whether labels exist for the given vehicle
-      let labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
+      labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
       if (selectedVehicle !== "None" && labelsExist && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
         // replace the id in the table with the label
         id = vehiclesJSON[selectedVehicle].labeled_ids[id];
       }
-
-      // just creating the HTML elements
-      let idTd = document.createElement("td"); // holds the ID or label
-      idTd.className = "string";
       idTd.textContent = id;
-      idTd.setAttribute("id", id);
       let countTd = document.createElement("td");
       countTd.className = "string";
       countTd.textContent = item[1];
@@ -227,7 +229,7 @@ function createMessageTable(data) {
   let idTd = document.createElement('td');
   idTd.className = `string ${id}`;
   // replace the ID with the label if one exists
-  let labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
+  labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
   if (selectedVehicle !== "None" && labelsExist && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
     id = vehiclesJSON[selectedVehicle].labeled_ids[id];
   }
@@ -253,18 +255,38 @@ function readLogFile(path) {
 
   // build the table that shows the count of each message
   logFileStream.on('end', () => {
-    createCountTable(idCounts)
+    document.getElementById("counting-msg").hidden = true;
+    document.getElementById("count-thead").hidden = false;
+    createCountTable(idCounts);
   });
 
   // build the table that shows ALL messages
   parser.on('data', data => {
-    createMessageTable(data)
+    createMessageTable(data);
   });
 
-  // un-hide table headers
+  clearAllTables();
+
+  // unhide the container for the tables;
   document.getElementById('CanMessageTables').hidden = false;
-  // once table is done bulding, show it
+  document.getElementById("counting-msg").hidden = false;
+  document.getElementById("count-thead").hidden = true;
+
+
+  // once table with all messages is done bulding, show it
   document.getElementById('message-table-container').hidden = false;
+}
+
+// clears both tables; used when reading in a new file
+function clearAllTables() {
+  if (tablesDrawn) {
+    clearMsgTableFilters();
+    clearCountTableFilters();
+    document.getElementById('CanMessageTables').hidden = true;
+    messageTableBody.innerHTML = "";
+    countTableBody.innerHTML = "";
+    tablesDrawn = false;
+  }
 }
 
 // puts list of log files the user can display in the drop down
@@ -362,12 +384,14 @@ function clearIdLabels() {
   // we know all IDs that have been changed, so just reset the innerHTML of each row
   if (tablesDrawn) {
     Object.keys(labeledIDs).forEach(id => {
+      console.log(id);
       document.getElementById(id).innerHTML = id;
       Array.from(document.getElementsByClassName(id)).forEach(rowId => {
         rowId.innerHTML = id;
       });
     });
   }
+  labelsExist = false;
   labeledIDs = {};
 }
 
