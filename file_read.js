@@ -255,19 +255,25 @@ function readLogFile(path) {
 
   // build the table that shows the count of each message
   logFileStream.on('end', () => {
-    createCountTable(idCounts)
+    document.getElementById("counting-msg").hidden = true;
+    document.getElementById("count-thead").hidden = false;
+    createCountTable(idCounts);
   });
 
   // build the table that shows ALL messages
   parser.on('data', data => {
-    createMessageTable(data)
+    createMessageTable(data);
   });
 
   clearAllTables();
 
-  // un-hide table headers
+  // unhide the container for the tables;
   document.getElementById('CanMessageTables').hidden = false;
-  // once table is done bulding, show it
+  document.getElementById("counting-msg").hidden = false;
+  document.getElementById("count-thead").hidden = true;
+
+
+  // once table with all messages is done bulding, show it
   document.getElementById('message-table-container').hidden = false;
 }
 
