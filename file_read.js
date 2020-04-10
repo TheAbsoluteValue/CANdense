@@ -1,5 +1,6 @@
 const Readline = require('@serialport/parser-readline');
 const fs = require('fs');
+const tableify = require('tableify'); //For HTML Tables
 
 // the point at which we will append a row for each message
 const messageTableBody = document.getElementById("message-table-body");
@@ -433,10 +434,26 @@ function vehicleSelectionChanged(event) {
   clearIdLabels(); // different vehicle, labels are different
   selectedVehicle = event.target.value;
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+
+  if(!isEmpty(labeledIDs)) {
+    document.getElementById('knownIdsTable').hidden = false;
+  } else {
+    document.getElementById('knownIdsTable').hidden = true;
+  }
+
+  //Create the table and send to the HTML page
+  let messageHTML = tableify(labeledIDs);
+  document.getElementById("tableID").innerHTML = messageHTML;
+
   if (tablesDrawn) {
     massTableUpdate();
   }
   populateVehicleProfileDropdown();
+}
+
+// check if labelled id's json is empty
+function isEmpty(obj) {
+  return Object.keys(obj).length === 0;
 }
 
 // clears the labels from both tables without recreating the whole table
