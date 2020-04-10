@@ -169,6 +169,7 @@ function createCountTable(idCounts) {
     countTableBody = document.getElementById('count-table-body');
     // array version of the object that has ID: count
     let idCountEntries = sortCountArray(Object.entries(idCounts));
+    idCountEntries.unshift(["id", "count"]);
     idCountEntries.forEach(item => {
       let newRow = document.createElement("tr");
       let id = item[0];
@@ -185,8 +186,15 @@ function createCountTable(idCounts) {
       }
       idTd.textContent = id;
       let countTd = document.createElement("td");
+
       countTd.className = "string";
       countTd.textContent = item[1];
+
+      // add css to some elements
+      countTd.classList.add("id-td");
+      idTd.classList.add("id-td");
+      newRow.classList.add("id-tr");
+
       // and appending them to the table
       newRow.appendChild(idTd);
       newRow.appendChild(countTd);
@@ -240,6 +248,12 @@ function createMessageTable(data) {
   let timeTd = document.createElement('td');
   timeTd.className = "string";
   timeTd.textContent = timeString;
+
+  // set additional css classes
+  messageTableBody.id = "msg-table";
+  idTd.classList.add("msg-td");
+  contentTd.classList.add("msg-td");
+  timeTd.classList.add("msg-td");
 
   newRow.appendChild(idTd);
   newRow.appendChild(contentTd);
