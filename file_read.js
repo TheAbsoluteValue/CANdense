@@ -10,6 +10,7 @@ let fileOptions; // list of the files the user can read in
 let selectedPath; // the path to the log file the user wants
 let vehiclesJSON; // vehicles.json parsed as an object
 let addVehicleBtn; // button for adding a vehicle profile
+let removeVehicleBtn; // button for removing a vehicle profile
 let vehicleDropdown; // dropdown user can select vehicle profile from
 let selectedVehicle = "None"; // name of the vehicle the user has selected
 let labeledIDs = {}; // object holding labeled IDs
@@ -87,16 +88,37 @@ document.addEventListener('DOMContentLoaded', () => {
         } else { // user tried to add '' to the list
           alert("Can not store empty vehicle name");
         }
+        // unhide the add vehicle button, so more can be added
+        addVehicleBtn.hidden = false;
+        removeVehicleBtn.hidden = false;
       });
 
       cancelBtn.addEventListener('click', () => {
         newVehicleInput.parentNode.removeChild(newVehicleInput);
         newVehicleBtn.parentNode.removeChild(newVehicleBtn);
         cancelBtn.parentNode.removeChild(cancelBtn);
+        addVehicleBtn.hidden = false;
+        removeVehicleBtn.hidden = false;
       });
+    }
+  }
 
-      // unhide the add vehicle button, so more can be added
-      addVehicleBtn.hidden = false;
+  function removeVehicleProfile() {
+    if (selectedVehicle !== "None") {
+      // remove the vehicle from vehicles.json
+      delete vehiclesJSON[selectedVehicle];
+      let newJSONtext = JSON.stringify(vehiclesJSON);
+      let fd = fs.openSync('vehicles.json', 'w');
+      fs.writeSync(fd, Buffer.from(newJSONtext));
+      fs.closeSync(fd);
+
+      // update the dropdown to remove the new vehicle
+      vehicleDropdown.remove(vehicleDropdown.selectedIndex);
+      // make the "None" the selected vehicle
+      vehicleDropdown.options[0].selected = true;
+      selectedVehicle = "None";
+
+      clearIdLabels();
     }
   }
 
@@ -121,7 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
   addVehicleBtn = document.getElementById('add-vehicle-btn');
   addVehicleBtn.addEventListener('click', () => {
     addVehicleBtn.hidden = true;
+    removeVehicleBtn.hidden = true;
     addVehicleProfile();
+  });
+
+  removeVehicleBtn = document.getElementById('remove-vehicle-btn');
+  removeVehicleBtn.addEventListener('click', () => {
+    removeVehicleProfile();
   });
 
   // add a label to IDs
