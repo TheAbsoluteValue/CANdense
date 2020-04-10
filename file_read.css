@@ -81,23 +81,29 @@ tr:nth-child(even) {
   background-color: rgb(175, 175, 175); 
 }
 
-/* 
 #id-table {
-  border: 2px solid black
-} */
+  border-top: 2px solid black; 
+  border-left: 2px solid black; 
+  border-bottom: 2px solid black; 
+}
 
 .id-tr {
   display: block;
   float: left;
+  border-right: 2px solid black; 
 }
 
 .id-td {
   display: block;
-  border: 2px solid black; 
 }
 
 .id-tr:first-child {
   font-weight: bold;
+}
+
+.id-td:nth-child(odd) {
+  border-bottom: 2px solid black; 
+  border-top: 2px solid black; 
 }
 
 .tableHeader {
