@@ -9,6 +9,7 @@ let os = getOS(); // string name of the OS which is used for file loading
 let fileOptions; // list of the files the user can read in
 let selectedPath; // the path to the log file the user wants
 let vehiclesJSON; // vehicles.json parsed as an object
+let addVehicleBtn; // button for adding a vehicle profile
 let vehicleDropdown; // dropdown user can select vehicle profile from
 let selectedVehicle = "None"; // name of the vehicle the user has selected
 let labeledIDs = {}; // object holding labeled IDs
@@ -48,10 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
       let newVehicleBtn = document.createElement("button");
       newVehicleBtn.innerHTML = "Save vehicle";
       newVehicleBtn.setAttribute("id", "new-vehicle-btn");
+      // a button to cancel the addition of new vehicles
+      let cancelBtn = document.createElement("button");
+      cancelBtn.innerHTML = "Cancel";
 
       // add the new object to the DOM
       addVehicleBtn.insertAdjacentElement('afterend', newVehicleInput);
+      newVehicleInput.insertAdjacentElement('afterend', cancelBtn);
       newVehicleInput.insertAdjacentElement('afterend', newVehicleBtn);
+
 
       // adds the new vehicle to vehicles.json
       newVehicleBtn.addEventListener('click', function() {
@@ -82,6 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
           alert("Can not store empty vehicle name");
         }
       });
+
+      cancelBtn.addEventListener('click', () => {
+        newVehicleInput.parentNode.removeChild(newVehicleInput);
+        newVehicleBtn.parentNode.removeChild(newVehicleBtn);
+        cancelBtn.parentNode.removeChild(cancelBtn);
+      });
+
+      // unhide the add vehicle button, so more can be added
+      addVehicleBtn.hidden = false;
     }
   }
 
@@ -103,8 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
   Allows user to add a vehicle to the list of vehicles. Also adds that vehicle to the
   vehicles.config JSON file.
   */
-  let addVehicleBtn = document.getElementById('add-vehicle-btn');
-  addVehicleBtn.addEventListener('click', addVehicleProfile);
+  addVehicleBtn = document.getElementById('add-vehicle-btn');
+  addVehicleBtn.addEventListener('click', () => {
+    addVehicleBtn.hidden = true;
+    addVehicleProfile();
+  });
 
   // add a label to IDs
   let idInput = document.getElementById('id-input');
