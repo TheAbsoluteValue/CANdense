@@ -1,5 +1,6 @@
 const SerialPort = require('serialport');
 const MockBinding = require('@serialport/binding-mock');
+const { spawn } = require('child_process');
 
 // set up the port to which we write to
 SerialPort.Binding = MockBinding;
@@ -41,11 +42,11 @@ document.getElementById('transmit-btn').addEventListener('click', () => {
 
   }
   // the interval at which the user wants to transmit the message (in ms) (optional, defaults to 1000ms)
-  let interval = document.getElementById('transmit-interval').value;
-  if (!interval || interval < 1) {interval = 1000}
+  let interval = +document.getElementById('transmit-interval').value;
+  if (interval < 1) {interval = 1000}
   // the number of times the user wants to transmit the message (defaults to 1)
-  let count = document.getElementById('transmit-count').value;
-  if (!count || count < 1) {count = 1}
+  let count = +document.getElementById('transmit-count').value;
+  if (count < 1) {count = 1}
   let transmissionString = `${id}#${data}`;
 
   /*
@@ -57,7 +58,7 @@ document.getElementById('transmit-btn').addEventListener('click', () => {
     if (id && data) {
       f();  // the initial call (to avoid the initial delay)
       count--;
-      timeoutID = setInterval(() => {
+      const timeoutID = setInterval(() => {
         if (count > 0) {
           f();
           count--;
@@ -69,6 +70,6 @@ document.getElementById('transmit-btn').addEventListener('click', () => {
   }
 
   setIntervalAndCallImmediately(() => {
-    port.write(transmissionString);
+    spawn('cansend', ['can0', transmissionString]);
   }, interval);
 });
