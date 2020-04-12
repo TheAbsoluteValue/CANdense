@@ -10,7 +10,9 @@ let os = getOS(); // string name of the OS which is used for file loading
 let fileOptions; // list of the files the user can read in
 let selectedPath; // the path to the log file the user wants
 let vehiclesJSON; // vehicles.json parsed as an object
-let addVehicleBtn; // button for adding a vehicle profile
+let modal;  // modal that allow user to enter vehicle name
+let newVehicleInput;  // text box to enter vehicle name within modal
+let addVehicleBtn; // button for opening the modal to add vehicle
 let removeVehicleBtn; // button for removing a vehicle profile
 let vehicleDropdown; // dropdown user can select vehicle profile from
 let selectedVehicle = "None"; // name of the vehicle the user has selected
@@ -41,86 +43,60 @@ let dataValFilter; // for the table with all messages
 document.addEventListener('DOMContentLoaded', () => {
   populateVehicleProfileDropdown(); // load in vehicle profiles for selection
   populateSelectFileDropdown(); // load list of log file names for selection
+  modal = document.getElementById("myModal");
+
+  /*
+  Allows user to add a vehicle to the list of vehicles. Also adds that vehicle to the
+  vehicles.config JSON file.
+  */
+  addVehicleBtn = document.getElementById('add-vehicle-btn');
+  addVehicleBtn.addEventListener('click', () => {
+    showModal();
+    // addVehicleProfile();
+  });
 
   // needs to be declared in this event because it accesses DOM elements
   function addVehicleProfile() {
-    {
-      // create the DOM objects for adding
-      let newVehicleInput = document.createElement("input");
-      newVehicleInput.setAttribute("id", "new-vehicle-input");
-      let newVehicleBtn = document.createElement("button");
-      newVehicleBtn.innerHTML = "Save vehicle";
-      newVehicleBtn.setAttribute("id", "new-vehicle-btn");
-      // a button to cancel the addition of new vehicles
-      let cancelBtn = document.createElement("button");
-      cancelBtn.innerHTML = "Cancel";
+    newVehicleInput = document.getElementById('new-vehicle-input');
+    let vehicleName = newVehicleInput.value;
+    if (vehicleName) { // add the vehicle to JSON object
+      vehiclesJSON[vehicleName] = {
+        "received_ids": [],
+        "labeled_ids": {},
+        "notes": ""
+      };
 
-      // add the new object to the DOM
-      addVehicleBtn.insertAdjacentElement('afterend', newVehicleInput);
-      newVehicleInput.insertAdjacentElement('afterend', cancelBtn);
-      newVehicleInput.insertAdjacentElement('afterend', newVehicleBtn);
-
-
-      // adds the new vehicle to vehicles.json
-      newVehicleBtn.addEventListener('click', function() {
-        let vehicleName = newVehicleInput.value;
-        if (vehicleName) { // add the vehicle to JSON object
-          vehiclesJSON[vehicleName] = {
-              "received_ids": [],
-              "labeled_ids": {},
-              "notes": ""
-          };
-
-          // write the vehicle to vehicles.json
-          let newJSONtext = JSON.stringify(vehiclesJSON);
-          let fd = fs.openSync('vehicles.json', 'w');
-          fs.writeSync(fd, Buffer.from(newJSONtext));
-          fs.closeSync(fd);
-
-          // update the dropdown to include the new vehicle
-          populateVehicleProfileDropdown();
-          // make the newly added vehicle the selected one
-          vehicleDropdown.options[vehicleDropdown.options.length - 1].selected = true;
-          selectedVehicle = vehicleName;
-
-          // remove button to save the vehicle and the name input
-          newVehicleInput.parentNode.removeChild(newVehicleInput);
-          newVehicleBtn.parentNode.removeChild(newVehicleBtn);
-        } else { // user tried to add '' to the list
-          alert("Can not store empty vehicle name");
-        }
-        // unhide the add vehicle button, so more can be added
-        addVehicleBtn.hidden = false;
-        removeVehicleBtn.hidden = false;
-      });
-
-      cancelBtn.addEventListener('click', () => {
-        newVehicleInput.parentNode.removeChild(newVehicleInput);
-        newVehicleBtn.parentNode.removeChild(newVehicleBtn);
-        cancelBtn.parentNode.removeChild(cancelBtn);
-        addVehicleBtn.hidden = false;
-        removeVehicleBtn.hidden = false;
-      });
-    }
-  }
-
-  function removeVehicleProfile() {
-    if (selectedVehicle !== "None") {
-      // remove the vehicle from vehicles.json
-      delete vehiclesJSON[selectedVehicle];
+      // write the vehicle to vehicles.json
       let newJSONtext = JSON.stringify(vehiclesJSON);
       let fd = fs.openSync('vehicles.json', 'w');
       fs.writeSync(fd, Buffer.from(newJSONtext));
       fs.closeSync(fd);
 
-      // update the dropdown to remove the new vehicle
-      vehicleDropdown.remove(vehicleDropdown.selectedIndex);
-      // make the "None" the selected vehicle
-      vehicleDropdown.options[0].selected = true;
-      selectedVehicle = "None";
-
-      clearIdLabels();
+      // update the dropdown to include the new vehicle
+      populateVehicleProfileDropdown();
+      // make the newly added vehicle the selected one
+      vehicleDropdown.options[vehicleDropdown.options.length - 1].selected = true;
+      selectedVehicle = vehicleName;
     }
+  }
+});
+
+function removeVehicleProfile() {
+  if (selectedVehicle !== "None") {
+    // remove the vehicle from vehicles.json
+    delete vehiclesJSON[selectedVehicle];
+    let newJSONtext = JSON.stringify(vehiclesJSON);
+    let fd = fs.openSync('vehicles.json', 'w');
+    fs.writeSync(fd, Buffer.from(newJSONtext));
+    fs.closeSync(fd);
+
+    // update the dropdown to remove the new vehicle
+    vehicleDropdown.remove(vehicleDropdown.selectedIndex);
+    // make the "None" the selected vehicle
+    vehicleDropdown.options[0].selected = true;
+    selectedVehicle = "None";
+
+    clearIdLabels();
   }
 
   // sets the currently selected path to the file that the user sees
@@ -137,16 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('clear-everything-btn').addEventListener('click', clearAllTables);
 
-  /*
-  Allows user to add a vehicle to the list of vehicles. Also adds that vehicle to the
-  vehicles.config JSON file.
-  */
-  addVehicleBtn = document.getElementById('add-vehicle-btn');
-  addVehicleBtn.addEventListener('click', () => {
-    addVehicleBtn.hidden = true;
-    removeVehicleBtn.hidden = true;
-    addVehicleProfile();
-  });
 
   removeVehicleBtn = document.getElementById('remove-vehicle-btn');
   removeVehicleBtn.addEventListener('click', () => {
@@ -196,18 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('table-count-clear-filter-btn').addEventListener('click', () => {
     clearCountTableFilters();
   });
-});
 
-// for table with all messages
-document.getElementById('table-all-apply-filter-btn').addEventListener('click', () => {
-  updateMessageTableFilters();
-  filterMsgTable();
-});
+  // for table with all messages
+  document.getElementById('table-all-apply-filter-btn').addEventListener('click', () => {
+    updateMessageTableFilters();
+    filterMsgTable();
+  });
 
-// for table with all messages
-document.getElementById('table-all-clear-filter-btn').addEventListener('click', () => {
-  clearMsgTableFilters();
-});
+  // for table with all messages
+  document.getElementById('table-all-clear-filter-btn').addEventListener('click', () => {
+    clearMsgTableFilters();
+  });
+}
 
 // creates the table to show user how many times messages of each ID occurred
 function createCountTable(idCounts) {
@@ -435,7 +401,7 @@ function vehicleSelectionChanged(event) {
   selectedVehicle = event.target.value;
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
 
-  if(!isEmpty(labeledIDs)) {
+  if (!isEmpty(labeledIDs)) {
     document.getElementById('knownIdsTable').hidden = false;
   } else {
     document.getElementById('knownIdsTable').hidden = true;
@@ -597,9 +563,9 @@ function filterMsgTable() {
   to this table since it does not display message counts (that is what the other table is for).
   */
   rowArray.forEach(row => {
-      if (!operator(
-          (idFilterExists ? msgTableFilters.by_id.includes(row.firstChild.textContent) ||
-            msgTableFilters.by_id.includes(row.firstChild.classList[1].textContent) : defaultTruthy),
+    if (!operator(
+        (idFilterExists ? msgTableFilters.by_id.includes(row.firstChild.textContent) ||
+          msgTableFilters.by_id.includes(row.firstChild.classList[1].textContent) : defaultTruthy),
         (dataFilterExists ? msgTableFilters.by_data_value.includes(row.children[1].textContent) : defaultTruthy))) {
       row.hidden = true;
       msgTableHiddenRows.push(row);
@@ -627,6 +593,25 @@ function clearMsgTableFilters() {
   msgTableHiddenRows.length = 0;
   msgTableFilters.by_id.length = 0;
   msgTableFilters.by_data_value.length = 0;
+}
+
+// Open the Modal
+function showModal() {
+  modal.style.display = "block";
+}
+
+// Close the modal and enter the new vehicle
+function hideModal() {
+  addVehicleProfile();
+  vehicleNameIn.value = '';
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
 }
 
 /* Given a list of integers, returns a new list that contains all the original numbers as well as

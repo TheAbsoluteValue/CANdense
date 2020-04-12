@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
@@ -9,117 +10,116 @@
 
 <body style="text-align:center;">
   <div id="narrow-container">
-  <!-- The header and the navbar -->
-  <h3 id="customHeader">CanDense</h3>
-  <div class="row">
-    <div class="col-12">
-      <nav class="navbar justify-content-center">
-        <ul class="list-inline">
-          <li class="list-inline-item">
-            <a href="live_read.html" class="navbar-link" onclick="endPage()">Live Read</a>
-          </li>
-          <li class="list-inline-item">
-            <a href="file_read.html" class="navbar-link" onclick="endPage()">File Read</a>
-          </li>
-          <li class="list-inline-item">
-            <a href="transmit.html" class="navbar-link" onclick="endPage()">Transmit</a>
-          </li>
-        </ul>
-      </nav>
+    <!-- The header and the navbar -->
+    <h3 id="customHeader">CanDense</h3>
+    <div class="row">
+      <div class="col-12">
+        <nav class="navbar justify-content-center">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <a href="live_read.html" class="navbar-link" onclick="endPage()">Live Read</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="file_read.html" class="navbar-link" onclick="endPage()">File Read</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="transmit.html" class="navbar-link" onclick="endPage()">Transmit</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <hr id="navbar-rule">
+      </div>
+    </div>
+
+    <!--First Column-->
+    <div class="row d-flex justify-content-center">
+      <div class="col-sm-6">
+        <h4>Reading</h4>
+        <!-- DOM elements relevant to selecting vehicle profile -->
+        <label id="vehicle-profile-label">Vehicle</label>
+        <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
+        <button id="add-vehicle-btn" onclick="showModal()">+</button>
+        <button id="remove-vehicle-btn">-</button>
+        <!-- Start/Pause the reading -->
+        <button id="toggleReadBtn" onclick="toggleReadBtnPressed()">Start reading</button>
+        <br>
+
+        <!-- Set the log path-->
+        <label for="logfile-path" title="The location to place the log and name of the log to create, will overwrite if name matches existing log">Log Location</label>
+        <input type="text" id="logfile-path" placeholder="path/to/logfile.log"></input>
+        <button onclick="setupLogger()" id="setLogPathBtn">Set log path</button>
+        <br>
+        <!-- Start/pause and stop logging buttons -->
+        <button id="toggleLogBtn" onclick="toggleLogBtnPressed()">Start Logging</button>
+        <button onclick="endLogger()">Save Log</button>
+        <br><br>
+
+        <!-- Add ID labels -->
+        <label for="id-input" title="An ID to add a label to">ID</label>
+        <input type="text" id="id-input" name="id-input" length="3" size="3"></input>
+        <label for="label-input" title="A label of what an ID represents, eg. Speed, RPM, etc.">Label</label>
+        <input type="text" id="label-input" name="label-input" length=16></input>
+        <button id="add-label-btn" onclick="addLabel()">+</button>
+        <br>
+
+        <!--Data-->
+        <div align="center">
+          <h4>Messages</h4>
+          <!--Container for the table of last occurences-->
+          <div id="table"></div>
+        </div>
+      </div>
+
+      <!--Second Column-->
+      <div class="col-sm-6">
+        <!-- DOM elements for filtering -->
+        <h4>Filters</h4>
+        <label for="id-filter" title="A particular ID to search for">ID</label>
+        <input type="text" name="id-filter" id="id-filter" size="2"></input>
+        <label for="msg-freq-filter" title="Shows messages that occured this often">ID Frequency</label>
+        <input type="text" name="msg-freq-filter" id="msg-freq-filter" size="5"></input><br>
+        <label for="msg-freq-tolerance" title="Turns the given frequency into a range of Freq +/- tolerance">Tolerance</label>
+        <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance" size="5"></input>
+        <br>
+
+        <label for="time-filter" title="Filters messages that have occured in the last seconds">Time (s)</label>
+        <input type="text" name="time-filter" id="time-filter"></input><br>
+        <label for="data-val-filter" title="Filters messages for specific data values">Data Field</label>
+        <input type="text" name="data-val-filter" id="data-val-filter"></input>
+        <br>
+
+        <!--Apply and clear fitlers-->
+        <button id="apply-filter-btn" onclick="filter()">Filter</button>
+        <button id="clear-filter-btn" onclick="clearFilter()">Clear</button>
+        <br>
+        <br>
+
+        <!--Data-->
+        <div align="center">
+          <h4>IDs</h4>
+          <!--Container for the table of ids and labels-->
+          <div id="tableID"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Modal -->
+    <div class="row d-flex justify-content-center">
+      <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <label for="vehicle-name">Enter a vehicle:</label>
+          <input type="text" name="vehicle-name" id="vehicle-name">
+          <button class="close" onclick="hideModal()">Enter</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12">
-      <hr id="navbar-rule">
-    </div>
-  </div>
-
-  <!--First Column-->
-  <div class="row d-flex justify-content-center">
-    <div class="col-sm-6">
-    <h4>Reading</h4>
-    <!-- DOM elements relevant to selecting vehicle profile -->
-    <label id="vehicle-profile-label">Vehicle</label>
-    <select type="file" id="vehicle-profile-name" onChange="vehicleSelectionChanged(event)"></select>
-    <button id="add-vehicle-btn" onclick="showModal()">+</button>
-    <button id="remove-vehicle-btn">-</button>
-    <!-- Start/Pause the reading -->
-    <button id="toggleReadBtn" onclick="toggleReadBtnPressed()">Start reading</button>
-    <br>
-
-    <!-- Set the log path-->
-    <label for="logfile-path" title="The location to place the log and name of the log to create, will overwrite if name matches existing log">Log Location</label>
-    <input type="text" id="logfile-path" placeholder="path/to/logfile.log"></input>
-    <button onclick="setupLogger()" id="setLogPathBtn">Set log path</button>
-    <br>
-    <!-- Start/pause and stop logging buttons -->
-    <button id="toggleLogBtn" onclick="toggleLogBtnPressed()">Start Logging</button>
-    <button onclick="endLogger()">Save Log</button>
-    <br><br>
-
-    <!-- Add ID labels -->
-    <label for="id-input" title="An ID to add a label to">ID</label>
-    <input type="text" id="id-input" name="id-input" length="3" size="3"></input>
-    <label for="label-input" title="A label of what an ID represents, eg. Speed, RPM, etc.">Label</label>
-    <input type="text" id="label-input" name="label-input" length=16></input>
-    <button id="add-label-btn" onclick="addLabel()">+</button>
-    <br>
-
-    <!--Data-->
-    <div align="center">
-      <h4>Messages</h4>
-      <!--Container for the table of last occurences-->
-      <div id="table"></div>
-    </div>
-  </div>
-
-  <!--Second Column-->
-    <div class="col-sm-6">
-    <!-- DOM elements for filtering -->
-    <h4>Filters</h4>
-    <label for="id-filter" title="A particular ID to search for">ID</label>
-    <input type="text" name="id-filter" id="id-filter" size="2"></input>
-    <label for="msg-freq-filter" title="Shows messages that occured this often">ID Frequency</label>
-    <input type="text" name="msg-freq-filter" id="msg-freq-filter" size="5"></input><br>
-    <label for="msg-freq-tolerance" title="Turns the given frequency into a range of Freq +/- tolerance">Tolerance</label>
-    <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance" size="5"></input>
-    <br>
-
-    <label for="time-filter" title="Filters messages that have occured in the last seconds">Time (s)</label>
-    <input type="text" name="time-filter" id="time-filter"></input><br>
-    <label for="data-val-filter" title="Filters messages for specific data values">Data Field</label>
-    <input type="text" name="data-val-filter" id="data-val-filter"></input>
-    <br>
-
-    <!--Apply and clear fitlers-->
-    <button id="apply-filter-btn" onclick="filter()">Filter</button>
-    <button id="clear-filter-btn" onclick="clearFilter()">Clear</button>
-    <br>
-    <br>
-
-    <!--Data-->
-    <div align="center">
-      <h4>IDs</h4>
-      <!--Container for the table of ids and labels-->
-      <div id="tableID"></div>
-    </div>
-  </div>
-  </div>
-
-
-
-  <!-- The Modal -->
-  <div class="row d-flex justify-content-center">
-  <div id="myModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-content">
-      <label for="vehicle-name">Enter a vehicle:</label>
-      <input type="text" name="vehicle-name" id="vehicle-name">
-      <button class="close" onclick="hideModal()">Enter</button>
-    </div>
-  </div>
-</div>
-</div>
 </body>
 <script src="./live_read.js"></script>
+
 </html>
