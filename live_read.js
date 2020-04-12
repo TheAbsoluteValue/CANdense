@@ -1,5 +1,5 @@
 const SerialPort = require('serialport');
-const MockBinding = require('@serialport/binding-mock'); 
+const MockBinding = require('@serialport/binding-mock');
 const fs = require('fs'); //NodeJS File System
 const tableify = require('tableify'); //For HTML Tables
 const parsers = SerialPort.parsers; //For the Port Parser
@@ -20,8 +20,8 @@ let fdLog;  // file descriptor the log file, integer id representing the file re
 let vehiclesJSON; //vehicles.json
 let logStream;  //output stream to pathToLog
 //Current state flags
-let isReading = false; 
-let isLogging = false; 
+let isReading = false;
+let isLogging = false;
 let isFilterable = true; //False when live reading to prevent filters colliding with live data
 //Buttons and inputs!
 let toggleReadBtn = document.getElementById('toggleReadBtn');
@@ -63,8 +63,8 @@ else {
 
 //Create the Port and Parser, and set the on('data')
 const port = new SerialPort(pathToPort);
-const parser = new parsers.Readline({ 
-  delimiter: '\r\n', //Readline Parser delimited on "carriage return newline" characters 
+const parser = new parsers.Readline({
+  delimiter: '\r\n', //Readline Parser delimited on "carriage return newline" characters
 });
 parser.on('data', data => {process(data);});
 
@@ -82,7 +82,7 @@ function process(data) {
   let unixTimeStamp = dataSplit[0].slice(1, -1); //Gather the timestamp, slicing off the surrounding parentheses
   let id = dataSplit[2].slice(0, 3); //Gather the id, first three characters of the data payload
   let messageData = dataSplit[2].slice(4); //Gather the data, The rest of the data payload after the 4th character
-  
+
   //Change timestamp from unixtime to hr:min:sec:ms
   let date = new Date(parseFloat(unixTimeStamp));
   let hours = date.getHours();
@@ -99,7 +99,7 @@ function process(data) {
 
   //Set the current message for the id whether a new id or refreshing an already seen id
   messages[id] = {"id": id, "data": messageData, "timestamp": timeString, "count": ++messageCount};
-  
+
   if(!dataValues[id]) {
     dataValues[id] = [messageData];
   }
@@ -116,10 +116,10 @@ function process(data) {
 
 //handle the toggle between reading and not reading
 function toggleReadBtnPressed() {
-  if (!isReading){ // if we are not reading  
+  if (!isReading){ // if we are not reading
     toggleReadBtn.innerHTML = "Pause reading"; //Toggle the button text
     startReading();
-  } 
+  }
   else {  //else we are reading, set the state and pauseReading
     toggleReadBtn.innerHTML = "Resume reading"; //Toggle the button text
     pauseReading();
@@ -142,7 +142,7 @@ function startReading() {
 //Called when the toggleReadBtn is clicked with isReading==true, make filterable and unpipe
 function pauseReading() {
   isReading = false;
-  isFilterable = true; 
+  isFilterable = true;
   if (isLogging) {
     pauseLogger();
   }
@@ -163,7 +163,7 @@ function toggleLogBtnPressed() {
     if (!pathToLog) {setUpLogger();} //If the log path is not setup, set it up
     if (!isReading) {toggleReadBtnPressed();} //If we are not reading yet
     startLogger();
-  } 
+  }
   else {  //else we are logging
     toggleLogBtn.innerHTML = "Resume Logging"; //Toggle the button text
     pauseLogger();
@@ -243,7 +243,7 @@ function filter() {
     let data = dataValues[id];
     let date = message.timestamp.split(":");
     let count = message.count;
-    let timeDifference = (currentHours - date[0]) * 3600 + (currentMinutes - date[1]) * 60 + (currentSeconds - date[2]) + (currentMillis - date[3]) / 100; 
+    let timeDifference = (currentHours - date[0]) * 3600 + (currentMinutes - date[1]) * 60 + (currentSeconds - date[2]) + (currentMillis - date[3]) / 100;
 
     if(!idFilter || idFilter == id) {
       if(!freqFilter) {
@@ -319,8 +319,10 @@ function addLabel() {
   vehiclesJSON[selectedVehicle]["labeled_ids"][id] = label;
   fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
-  messages[label] = {"id": label, "data": messages[id].data, "timestamp": messages[id].timestamp, "count": messages[id].count};
-  delete messages[id];
+  if (Object.keys(messages).length !== 0) {
+    messages[label] = {"id": label, "data": messages[id].data, "timestamp": messages[id].timestamp, "count": messages[id].count};
+  }
+  delete [id];
   dataValues[label] = dataValues[id];
   delete dataValues[id];
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
@@ -335,6 +337,8 @@ function addLabel() {
 //Add the vehicle to the JSON file
 function addVehicle(name) {
   vehicleDropDown.options.add(new Option(name));
+  vehicleDropDown.options[vehicleDropDown.options.length - 1].selected = true;
+  selectedVehicle = name;
   vehiclesJSON[name] = {
       "received_ids": [],
       "labeled_ids": {},
