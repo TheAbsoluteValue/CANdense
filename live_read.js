@@ -347,6 +347,26 @@ function addVehicle(name) {
   fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
 }
 
+document.getElementById('remove-vehicle-btn').addEventListener('click', removeVehicleProfile);
+
+function removeVehicleProfile() {
+  if (selectedVehicle !== "None") {
+    // remove the vehicle from vehicles.json
+    delete vehiclesJSON[selectedVehicle];
+    let newJSONtext = JSON.stringify(vehiclesJSON);
+    let fd = fs.openSync('vehicles.json', 'w');
+    fs.writeSync(fd, Buffer.from(newJSONtext));
+    fs.closeSync(fd);
+
+    // update the dropdown to remove the new vehicle
+    vehicleDropDown.remove(vehicleDropDown.selectedIndex);
+    // make the "None" the selected vehicle
+    vehicleDropDown.options[0].selected = true;
+    selectedVehicle = "None";
+    document.getElementById("tableID").innerHTML = "";
+  }
+}
+
 //Open the Modal
 function showModal() {
   modal.style.display = "block";
@@ -357,7 +377,6 @@ function hideModal() {
   addVehicle(vehicleNameIn.value);
   vehicleNameIn.value = '';
   modal.style.display = "none";
-
 }
 
 // When the user clicks anywhere outside of the modal, close it
