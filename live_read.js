@@ -322,7 +322,7 @@ function addLabel() {
   if (Object.keys(messages).length !== 0) {
     messages[label] = {"id": label, "data": messages[id].data, "timestamp": messages[id].timestamp, "count": messages[id].count};
   }
-  delete [id];
+  delete messages[id];
   dataValues[label] = dataValues[id];
   delete dataValues[id];
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
