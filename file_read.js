@@ -30,9 +30,8 @@ const msgTableFilters = {
   by_id: [],
   by_data_value: []
 }
-const countTableHiddenRows = [] // list of rows of the count table hidden by filter; makes unhdiding easy
-const msgTableHiddenRows = [] // list of rows of all message table hidden by filter;
-// makes unhiding easier
+const countTableRows = [] // list of list of [row, even/odd row] of the count table so that when clearing filters, the table has correct color banding
+const msgTableRows = [] // same as with countTableRows
 let countIdFilter; // for the count table
 let freqFilter; // for the count table
 let freqTolerance; // for the count table
@@ -206,14 +205,31 @@ function createCountTable(idCounts) {
     countTableBody = document.getElementById('count-table-body');
     // array version of the object that has ID: count
     let idCountEntries = sortCountArray(Object.entries(idCounts));
-    idCountEntries.unshift(["id", "count"]);
+    idCountEntries.unshift(["ID", "Count"]);
+
+    // let headerRow = document.createElement('tr');
+    // headerRow.classList.add("even");
+    // let idHeader = document.createElement('td');
+    // idHeader.textContent = "ID";
+    // let countHeader = document.createElement('td');
+    // countHeader.textContent = "Count";
+    // headerRow.appendChild(idHeader);
+    // headerRow.appendChild(countHeader);
+    // countTableBody.appendChild(headerRow);
+
+    let isOddRow = false;  // used for alternate coloring of rows; start with even (for header)
     idCountEntries.forEach(item => {
       let newRow = document.createElement("tr");
+      if (isOddRow){
+        newRow.classList.add("odd");
+      } else {
+        newRow.classList.add("even");
+      }
+      isOddRow = !isOddRow;
       let id = item[0];
 
       // just creating the HTML elements
       let idTd = document.createElement("td"); // holds the ID or label
-      idTd.className = "string";
       idTd.setAttribute("id", id);
       // check whether labels exist for the given vehicle
       labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
@@ -243,6 +259,7 @@ function createCountTable(idCounts) {
   }
 }
 
+let rowIsOdd = true;  // whether the message table row is odd
 // creates the table to show ALL received messages
 function createMessageTable(data) {
   // split data in to ID, message data, and time step
@@ -271,6 +288,12 @@ function createMessageTable(data) {
 
   // add message to the table (doesn't show until ALL messages are added)
   let newRow = document.createElement('tr');
+  if (rowIsOdd) {
+    newRow.className = "odd"
+  } else {
+    newRow.className = "even";
+  }
+  rowIsOdd = !rowIsOdd;
   let idTd = document.createElement('td');
   idTd.className = `string ${id}`;
   // replace the ID with the label if one exists
@@ -454,7 +477,6 @@ function clearIdLabels() {
   // we know all IDs that have been changed, so just reset the innerHTML of each row
   if (tablesDrawn) {
     Object.keys(labeledIDs).forEach(id => {
-      console.log(id);
       document.getElementById(id).innerHTML = id;
       Array.from(document.getElementsByClassName(id)).forEach(rowId => {
         rowId.innerHTML = id;
@@ -537,7 +559,7 @@ function filterCountTable() {
     defaultTruthy = true;
   }
   // Array is more easily iterated through than HTMLcollection
-  let rowArray = Array.from(countTableBody.children);
+  let rowArray = Array.from(countTableBody.children).slice(1);
   const idFilterExists = countTableFilters.by_id.length > 0;
   const frequencyFilterExists = countTableFilters.by_msg_freq.length > 0;
   const frequencyToleranceExists = Boolean(msgFreqTolerance.value);
@@ -550,6 +572,7 @@ function filterCountTable() {
   The rows are filtered by ID (or its label) and by message count. The data field and time stamp
   filters do not apply to the data present in this table.
   */
+  let remainingRowIsOdd = true; // start with odd (due to header)
   rowArray.forEach(row => {
     /* Table rows are hidden if they do not satisfy ALL filter constraints the user has added.
     For each type of filter, we need to check if the user has even entered any values for that
@@ -565,7 +588,18 @@ function filterCountTable() {
         (idFilterExists ? countTableFilters.by_id.includes(row.firstChild.textContent) : defaultTruthy),
         (frequencyFilterExists ? frequencyValues.includes(Number(row.children[1].innerHTML)) : defaultTruthy))) {
       row.hidden = true;
-      countTableHiddenRows.push(row);
+      countTableRows.push([row, Array.from(row.classList).includes("odd")]);
+    } else {
+      // need to do this in the else block in case the class list changes after filtering
+      msgTableRows.push([row, Array.from(row.classList).includes("odd")]);
+      if (remainingRowIsOdd) {
+        row.classList.remove("even");
+        row.classList.add("odd");
+      } else {
+        row.classList.remove("odd");
+        row.classList.add("even");
+      }
+      remainingRowIsOdd = !remainingRowIsOdd;
     }
   });
 }
@@ -589,35 +623,61 @@ function filterMsgTable() {
   filtered by ID (or its label), data field value, and time step. The count filter is not applicable
   to this table since it does not display message counts (that is what the other table is for).
   */
+  let remainingRowIsOdd = true;
   rowArray.forEach(row => {
     if (!operator(
         (idFilterExists ? msgTableFilters.by_id.includes(row.firstChild.textContent) ||
           msgTableFilters.by_id.includes(row.firstChild.classList[1].textContent) : defaultTruthy),
         (dataFilterExists ? msgTableFilters.by_data_value.includes(row.children[1].textContent) : defaultTruthy))) {
       row.hidden = true;
-      msgTableHiddenRows.push(row);
+      msgTableRows.push([row, Array.from(row.classList).includes("odd")]);
+    } else {
+      // need to do this in the else block in case the class list changes after filtering
+      msgTableRows.push([row, Array.from(row.classList).includes("odd")]);
+      if (remainingRowIsOdd) {
+        row.classList.remove("even");
+        row.classList.add("odd");
+      } else {
+        row.classList.remove("odd");
+        row.classList.add("even");
+      }
+      remainingRowIsOdd = !remainingRowIsOdd;
     }
   });
 }
 
 function clearCountTableFilters() {
-  countTableHiddenRows.forEach(row => {
-    row.hidden = false;
+  countTableRows.slice(1).forEach(row => {
+    row[0].hidden = false;
+    if (row[1]) {  // a boolean representing whether row is odd
+      row[0].classList.remove("even");
+      row[0].classList.add("odd");
+    } else {
+      row[0].classList.remove("odd");
+      row[0].classList.add("even");
+    }
   });
 
   // setting length == 0 clears the list
-  countTableHiddenRows.length = 0;
+  countTableRows.length = 0;
   countTableFilters.by_id.length = 0;
   countTableFilters.by_msg_freq.length = 0;
 }
 
 function clearMsgTableFilters() {
-  msgTableHiddenRows.forEach(row => {
-    row.hidden = false;
+  msgTableRows.forEach(row => {
+    row[0].hidden = false;
+    if (row[1]) {  // a boolean representing whether the row is odd
+      row[0].classList.remove("even");
+      row[0].classList.add("odd");
+    } else {
+      row[0].classList.remove("odd");
+      row[0].classList.add("even");
+    }
   });
 
   // setting length == 0 clears the list
-  msgTableHiddenRows.length = 0;
+  msgTableRows.length = 0;
   msgTableFilters.by_id.length = 0;
   msgTableFilters.by_data_value.length = 0;
 }
