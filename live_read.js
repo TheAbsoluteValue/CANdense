@@ -374,7 +374,9 @@ function showModal() {
 
 //Close the modal and enter the new vehicle
 function hideModal() {
-  addVehicle(vehicleNameIn.value);
+  if (vehicleNameIn.value) {
+    addVehicle(vehicleNameIn.value);
+  }
   vehicleNameIn.value = '';
   modal.style.display = "none";
 }
