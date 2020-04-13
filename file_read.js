@@ -131,13 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // add the label to vehicles.json if that label isn't already used
       let labelAlreadyUsed = false;
-      console.log(labelAlreadyUsed);
       Object.values(currentLabeledIDs).forEach(val => {
         if (label === val) labelAlreadyUsed = true;
         return;
       });
-      console.log(labelAlreadyUsed);
-      console.log('--------')
 
       if (!labelAlreadyUsed) {
         let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
@@ -163,6 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
           populateMessageTableLabels(id, label);
           populateCountTableLabels(id, label);
         }
+
+        idInput.value = "";
+        labelInput.value = "";
       } else {
         alert("That label has already been used.")
       }
