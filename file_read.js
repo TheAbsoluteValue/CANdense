@@ -16,7 +16,7 @@ let addVehicleBtn; // button for opening the modal to add vehicle
 let removeVehicleBtn; // button for removing a vehicle profile
 let vehicleDropdown; // dropdown user can select vehicle profile from
 let selectedVehicle = "None"; // name of the vehicle the user has selected
-let labeledIDs = {}; // object holding labeled IDs
+let currentLabeledIDs = {}; // object holding labeled IDs for the selected vehicle
 let labelsExist = false; // whether there are labels for the selected vehicle
 const idCounts = {}; // the count of each message (used in count table)
 let tablesDrawn = false; // whether both tables are drawn
@@ -128,27 +128,43 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Must enter ID and label');
         return; // error; nothing more should happen
       }
-      // add the label to vehicles.json
-      let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
-      if (labeledIdObject == undefined) {
-        vehiclesJSON[selectedVehicle].labeled_ids = {};
-        vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+
+      // add the label to vehicles.json if that label isn't already used
+      let labelAlreadyUsed = false;
+      console.log(labelAlreadyUsed);
+      Object.values(currentLabeledIDs).forEach(val => {
+        if (label === val) labelAlreadyUsed = true;
+        return;
+      });
+      console.log(labelAlreadyUsed);
+      console.log('--------')
+
+      if (!labelAlreadyUsed) {
+        let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
+        if (labeledIdObject == undefined) {
+          vehiclesJSON[selectedVehicle].labeled_ids = {};
+          vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+          currentLabeledIDs[id] = label;
+        } else {
+          vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
+          currentLabeledIDs[id] = label;
+        }
+        let jsonString = JSON.stringify(vehiclesJSON);
+        let fd = fs.openSync('vehicles.json', 'w');
+        fs.writeSync(fd, jsonString);
+
+        // show the labeled ID table
+        let messageHTML = tableify(labeledIdObject);
+        document.getElementById("tableID").innerHTML = messageHTML;
+        document.getElementById('knownIdsTable').hidden = false;
+
+        // update the count and message tables to reflect the new labels, if tables have been created
+        if (tablesDrawn) {
+          populateMessageTableLabels(id, label);
+          populateCountTableLabels(id, label);
+        }
       } else {
-        vehiclesJSON[selectedVehicle].labeled_ids[id] = label;
-      }
-      let jsonString = JSON.stringify(vehiclesJSON);
-      let fd = fs.openSync('vehicles.json', 'w');
-      fs.writeSync(fd, jsonString);
-
-      // show the labeled ID table
-      let messageHTML = tableify(labeledIdObject);
-      document.getElementById("tableID").innerHTML = messageHTML;
-      document.getElementById('knownIdsTable').hidden = false;
-
-      // update the count and message tables to reflect the new labels, if tables have been created
-      if (tablesDrawn) {
-        populateMessageTableLabels(id, label);
-        populateCountTableLabels(id, label);
+        alert("That label has already been used.")
       }
     } else {
       alert("Please select a vehicle to add ID label to");
@@ -202,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // creates the table to show user how many times messages of each ID occurred
 function createCountTable(idCounts) {
   {
-    labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+    currentLabeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
     countTableBody = document.getElementById('count-table-body');
     // array version of the object that has ID: count
     let idCountEntries = sortCountArray(Object.entries(idCounts));
@@ -448,23 +464,23 @@ function sortCountArray(arr) {
 function vehicleSelectionChanged(event) {
   // different vehicle, labels are different
   clearTableLabels(); // clears all labels out of the HTML table
-  clearIDLabelArray(); // clears labeledIDs/"#knownIdsTable" in HTML
+  clearIDLabelArray(); // clears currentLabeledIDs/"#knownIdsTable" in HTML
 
   // get new vehicle name and any associated ID labels
   selectedVehicle = event.target.value;
-  labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  currentLabeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
 
-  if (!isEmpty(labeledIDs)) {
+  if (!isEmpty(currentLabeledIDs)) {
     document.getElementById('knownIdsTable').hidden = false;
   } else {
     document.getElementById('knownIdsTable').hidden = true;
   }
 
   // Create the table and send to the HTML page
-  let messageHTML = tableify(labeledIDs);
+  let messageHTML = tableify(currentLabeledIDs);
   document.getElementById("tableID").innerHTML = messageHTML;
 
-  if (tablesDrawn && !isEmpty(labeledIDs)) {
+  if (tablesDrawn && !isEmpty(currentLabeledIDs)) {
     populateTableLabels();
   }
 
@@ -474,16 +490,16 @@ function vehicleSelectionChanged(event) {
 // check if labelled id's json is empty
 function isEmpty(obj) {
   // need the 2nd condition because the empty array can also just have 1 key which is empty string
-  return ((Object.keys(obj).length === 0) || !Boolean(Object.keys(labeledIDs)[0]));
+  return ((Object.keys(obj).length === 0) || !Boolean(Object.keys(currentLabeledIDs)[0]));
 }
 
 // change the labels in the HTML table back to the actual ID rather than its label
 // access count table rows through their ID attribute
 // access message table rows through their class attribute
 function clearTableLabels() {
-  if (!isEmpty(labeledIDs)) {
-    // keys of labeledIDs are the raw ID name (e.g. F3A)
-    Object.keys(labeledIDs).forEach(id => {
+  if (!isEmpty(currentLabeledIDs)) {
+    // keys of currentLabeledIDs are the raw ID name (e.g. F3A)
+    Object.keys(currentLabeledIDs).forEach(id => {
       // clear the labels in the count table by changing the single <td> holding the ID
       document.getElementById(id.toString()).textContent = id;
       // clear the labels in the count table by changing the <td> of each row holding the ID
@@ -497,7 +513,7 @@ function clearTableLabels() {
 // clear the data structure holding the labels to allow new vehicle labels to be loaded in
 function clearIDLabelArray() {
   labelsExist = false;
-  labeledIDs = {};
+  currentLabeledIDs = {};
   document.getElementById('knownIdsTable').hidden = true;
   document.getElementById("tableID").innerHTML = '';
 }
@@ -525,7 +541,7 @@ function populateMessageTableLabels(updateID, newLabel) {
 
 // used when changing vehicles; updates both tables with the new vehicle's labels
 function populateTableLabels() {
-  Object.entries(labeledIDs).forEach(entry => {
+  Object.entries(currentLabeledIDs).forEach(entry => {
     populateCountTableLabels(entry[0], entry[1]);
     populateMessageTableLabels(entry[0], entry[1]);
   });
