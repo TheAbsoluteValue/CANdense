@@ -93,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
       vehicleDropdown.options[0].selected = true;
       selectedVehicle = "None";
 
-      clearIdLabels();
+      clearTableLabels();
+      clearIDLabelArray();
     }
   }
 
@@ -146,8 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // update the count and message tables to reflect the new labels, if tables have been created
       if (tablesDrawn) {
-        updateMessageTable(id, label);
-        updateCountTable(id, label);
+        populateMessageTableLabels(id, label);
+        populateCountTableLabels(id, label);
       }
     } else {
       alert("Please select a vehicle to add ID label to");
@@ -217,10 +218,10 @@ function createCountTable(idCounts) {
     // headerRow.appendChild(countHeader);
     // countTableBody.appendChild(headerRow);
 
-    let isOddRow = false;  // used for alternate coloring of rows; start with even (for header)
+    let isOddRow = false; // used for alternate coloring of rows; start with even (for header)
     idCountEntries.forEach(item => {
       let newRow = document.createElement("tr");
-      if (isOddRow){
+      if (isOddRow) {
         newRow.classList.add("odd");
       } else {
         newRow.classList.add("even");
@@ -259,7 +260,7 @@ function createCountTable(idCounts) {
   }
 }
 
-let rowIsOdd = true;  // whether the message table row is odd
+let rowIsOdd = true; // whether the message table row is odd
 // creates the table to show ALL received messages
 function createMessageTable(data) {
   // split data in to ID, message data, and time step
@@ -445,7 +446,11 @@ function sortCountArray(arr) {
 
 // When the user selects a new vehicle, this event fires
 function vehicleSelectionChanged(event) {
-  clearIdLabels(); // different vehicle, labels are different
+  // different vehicle, labels are different
+  clearTableLabels(); // clears all labels out of the HTML table
+  clearIDLabelArray(); // clears labeledIDs/"#knownIdsTable" in HTML
+
+  // get new vehicle name and any associated ID labels
   selectedVehicle = event.target.value;
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
 
@@ -459,45 +464,59 @@ function vehicleSelectionChanged(event) {
   let messageHTML = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTML;
 
-  if (tablesDrawn) {
-    massTableUpdate();
+  if (tablesDrawn && !isEmpty(labeledIDs)) {
+    populateTableLabels();
   }
+
   populateVehicleProfileDropdown();
 }
 
 // check if labelled id's json is empty
 function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
+  // need the 2nd condition because the empty array can also just have 1 key which is empty string
+  return ((Object.keys(obj).length === 0) || !Boolean(Object.keys(labeledIDs)[0]));
 }
 
-// clears the labels from both tables without recreating the whole table
-function clearIdLabels() {
-  document.getElementById('knownIdsTable').hidden = true;
-  document.getElementById("tableID").innerHTML = '';
-
-  // we know all IDs that have been changed, so just reset the innerHTML of each row
-  if (tablesDrawn) {
+// change the labels in the HTML table back to the actual ID rather than its label
+// access count table rows through their ID attribute
+// access message table rows through their class attribute
+function clearTableLabels() {
+  if (!isEmpty(labeledIDs)) {
+    // keys of labeledIDs are the raw ID name (e.g. F3A)
     Object.keys(labeledIDs).forEach(id => {
-      document.getElementById(id).innerHTML = id;
-      Array.from(document.getElementsByClassName(id)).forEach(rowId => {
-        rowId.innerHTML = id;
+      // clear the labels in the count table by changing the single <td> holding the ID
+      document.getElementById(id.toString()).textContent = id;
+      // clear the labels in the count table by changing the <td> of each row holding the ID
+      Array.from(document.getElementsByClassName(id)).forEach(idTd => {
+        idTd.textContent = id;
       });
     });
   }
+}
+
+// clear the data structure holding the labels to allow new vehicle labels to be loaded in
+function clearIDLabelArray() {
   labelsExist = false;
   labeledIDs = {};
+  document.getElementById('knownIdsTable').hidden = true;
+  document.getElementById("tableID").innerHTML = '';
+}
+
+// construct the new label array and populate the "#knownIdsTable"
+function constructNewLabelArray() {
+
 }
 
 // adds a label to the row with the count of the given ID
-// only changes for a single id, massTableUpdate handles for ALL labeled IDs
-function updateCountTable(updateID, newLabel) {
+// only changes for a single id, populateTableLabels handles for ALL labeled IDs
+function populateCountTableLabels(updateID, newLabel) {
   let updateTd = document.getElementById(updateID.toString());
   updateTd.innerHTML = newLabel;
 }
 
 // adds a label for each row in the table with the given ID
-// only changes for a single id, massTableUpdate handles for ALL labeled IDs
-function updateMessageTable(updateID, newLabel) {
+// only changes for a single id, populateTableLabels handles for ALL labeled IDs
+function populateMessageTableLabels(updateID, newLabel) {
   let rowArray = Array.from(messageTableBody.getElementsByClassName(updateID));
   rowArray.forEach(tableRowId => {
     tableRowId.innerHTML = newLabel;
@@ -505,10 +524,10 @@ function updateMessageTable(updateID, newLabel) {
 }
 
 // used when changing vehicles; updates both tables with the new vehicle's labels
-function massTableUpdate() {
+function populateTableLabels() {
   Object.entries(labeledIDs).forEach(entry => {
-    updateCountTable(entry[0], entry[1]);
-    updateMessageTable(entry[0], entry[1]);
+    populateCountTableLabels(entry[0], entry[1]);
+    populateMessageTableLabels(entry[0], entry[1]);
   });
 }
 
@@ -650,7 +669,7 @@ function filterMsgTable() {
 function clearCountTableFilters() {
   countTableRows.slice(1).forEach(row => {
     row[0].hidden = false;
-    if (row[1]) {  // a boolean representing whether row is odd
+    if (row[1]) { // a boolean representing whether row is odd
       row[0].classList.remove("even");
       row[0].classList.add("odd");
     } else {
@@ -668,7 +687,7 @@ function clearCountTableFilters() {
 function clearMsgTableFilters() {
   msgTableRows.forEach(row => {
     row[0].hidden = false;
-    if (row[1]) {  // a boolean representing whether the row is odd
+    if (row[1]) { // a boolean representing whether the row is odd
       row[0].classList.remove("even");
       row[0].classList.add("odd");
     } else {
