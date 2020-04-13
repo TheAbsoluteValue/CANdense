@@ -240,7 +240,7 @@ function createCountTable(idCounts) {
       idTd.textContent = id;
       let countTd = document.createElement("td");
 
-      countTd.className = "string";
+      countTd.classList.add("string");
       countTd.textContent = item[1];
 
       // add css to some elements
@@ -289,13 +289,14 @@ function createMessageTable(data) {
   // add message to the table (doesn't show until ALL messages are added)
   let newRow = document.createElement('tr');
   if (rowIsOdd) {
-    newRow.className = "odd"
+    newRow.classList.add("odd");
   } else {
-    newRow.className = "even";
+    newRow.classList.add("even");
   }
   rowIsOdd = !rowIsOdd;
   let idTd = document.createElement('td');
-  idTd.className = `string ${id}`;
+  idTd.classList.add("string");
+  idTd.classList.add(`${id}`);
   // replace the ID with the label if one exists
   labelsExist = vehiclesJSON[selectedVehicle].labeled_ids != undefined;
   if (selectedVehicle !== "None" && labelsExist && vehiclesJSON[selectedVehicle].labeled_ids[id]) {
@@ -303,10 +304,10 @@ function createMessageTable(data) {
   }
   idTd.textContent = id;
   let contentTd = document.createElement('td');
-  contentTd.className = "string";
+  contentTd.classList.add("string");
   contentTd.textContent = content;
   let timeTd = document.createElement('td');
-  timeTd.className = "string";
+  timeTd.classList.add("string");
   timeTd.textContent = timeString;
 
   // set additional css classes
