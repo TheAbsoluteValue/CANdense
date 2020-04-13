@@ -86,7 +86,7 @@
 
     <!-- table to display counts of each ID -->
     <div id="CanMessageTables" hidden>
-      <h4 class="customHeader" align="center">Number of Messages by ID</h3><br>
+      <h4 class="customHeader" align="center">Number of Messages by ID</h3>
         <!-- Count table filter settings -->
         <div class="row justify-content-center">
           <div class="col-md-auto">
@@ -97,18 +97,18 @@
                 <div class="horizontal-5050-div">
                   <label for="table-count-id-filter">ID <br><input type="text" name="table-count-id-filter" id="table-count-id-filter"></label>
                   <br><br>
-                  <div>
-                    <label style="padding-right: 2px;">OR <input type="radio" value="OR" name="table-count-filter-operator" checked></label>
-                    <label>AND <input type="radio" value="AND" name="table-count-filter-operator"></label>
-                  </div>
-                </div>
-                <div class="horizontal-5050-div">
+                  <!-- </div>
+                       <div class="horizontal-5050-div"> -->
                   <label for="table-count-freq-filter">ID Frequency<br><input type="number" name="table-count-freq-filter" id="table-count-freq-filter" class="input-small"></label>
                   <label for="msg-freq-tolerance">Frequency Tolerance <br><input type="number" name="table-count-msg-freq-tolerance" id="table-count-freq-tolerance" class="input-small"></label>
                 </div>
                 <br>
               </div>
-              <div class="center">
+	      <div class="center">
+		  <label style="padding-right: 2px;">OR <input type="radio" value="OR" name="table-count-filter-operator" checked></label>
+		  <label>AND <input type="radio" value="AND" name="table-count-filter-operator"></label>
+	      </div>
+	      <div class="center">
                 <button id="table-count-apply-filter-btn">Filter</button>&nbsp;
                 <button id="table-count-clear-filter-btn">Clear</button>
               </div>

@@ -27,11 +27,13 @@ body {
 }
 
 #transmitBody {
+    border: solid #2B60DE;
     align-self: center;
     margin: auto;
     width: 700px;
     padding-top: 20px !important;
     padding: 100px;
+    padding-bottom: 30px;
 }
 
 label {
