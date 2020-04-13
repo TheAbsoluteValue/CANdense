@@ -73,13 +73,21 @@ a:hover {
   border: 2px solid black
 }
 
-tr:nth-child(odd) {
+.odd {
+  background-color: rgb(175, 175, 175);
+}
+
+.even {
   background-color: white;
 }
 
-tr:nth-child(even) {
+/* tr:nth-child(odd):not([hidden]):{
+  background-color: white;
+} */
+
+/* tr:nth-child(even):not([hidden]) {
   background-color: rgb(175, 175, 175);
-}
+} */
 
 #id-table {
   border-top: 2px solid black;
