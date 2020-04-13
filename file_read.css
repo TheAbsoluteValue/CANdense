@@ -157,7 +157,7 @@ h5 {
 }
 
 /* The Close Button */
-#close {
+#close-modal-btn {
     color: #aaaaaa;
     float: right;
     font-size: 28px;
@@ -166,7 +166,7 @@ h5 {
     border: none;
 }
 
-#close:hover, .close:focus {
+#close-modal-btn:hover, .close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;

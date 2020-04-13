@@ -10,8 +10,8 @@ let os = getOS(); // string name of the OS which is used for file loading
 let fileOptions; // list of the files the user can read in
 let selectedPath; // the path to the log file the user wants
 let vehiclesJSON; // vehicles.json parsed as an object
-let modal;  // modal that allow user to enter vehicle name
-let newVehicleInput;  // text box to enter vehicle name within modal
+let modal; // modal that allow user to enter vehicle name
+let newVehicleInput; // text box to enter vehicle name within modal
 let addVehicleBtn; // button for opening the modal to add vehicle
 let removeVehicleBtn; // button for removing a vehicle profile
 let vehicleDropdown; // dropdown user can select vehicle profile from
@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   addVehicleBtn = document.getElementById('add-vehicle-btn');
   addVehicleBtn.addEventListener('click', () => {
     showModal();
-    // addVehicleProfile();
   });
 
   // needs to be declared in this event because it accesses DOM elements
@@ -79,24 +78,24 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedVehicle = vehicleName;
     }
   }
-});
 
-function removeVehicleProfile() {
-  if (selectedVehicle !== "None") {
-    // remove the vehicle from vehicles.json
-    delete vehiclesJSON[selectedVehicle];
-    let newJSONtext = JSON.stringify(vehiclesJSON);
-    let fd = fs.openSync('vehicles.json', 'w');
-    fs.writeSync(fd, Buffer.from(newJSONtext));
-    fs.closeSync(fd);
+  function removeVehicleProfile() {
+    if (selectedVehicle !== "None") {
+      // remove the vehicle from vehicles.json
+      delete vehiclesJSON[selectedVehicle];
+      let newJSONtext = JSON.stringify(vehiclesJSON);
+      let fd = fs.openSync('vehicles.json', 'w');
+      fs.writeSync(fd, Buffer.from(newJSONtext));
+      fs.closeSync(fd);
 
-    // update the dropdown to remove the new vehicle
-    vehicleDropdown.remove(vehicleDropdown.selectedIndex);
-    // make the "None" the selected vehicle
-    vehicleDropdown.options[0].selected = true;
-    selectedVehicle = "None";
+      // update the dropdown to remove the new vehicle
+      vehicleDropdown.remove(vehicleDropdown.selectedIndex);
+      // make the "None" the selected vehicle
+      vehicleDropdown.options[0].selected = true;
+      selectedVehicle = "None";
 
-    clearIdLabels();
+      clearIdLabels();
+    }
   }
 
   // sets the currently selected path to the file that the user sees
@@ -112,7 +111,6 @@ function removeVehicleProfile() {
   });
 
   document.getElementById('clear-everything-btn').addEventListener('click', clearAllTables);
-
 
   removeVehicleBtn = document.getElementById('remove-vehicle-btn');
   removeVehicleBtn.addEventListener('click', () => {
@@ -141,6 +139,11 @@ function removeVehicleProfile() {
       let jsonString = JSON.stringify(vehiclesJSON);
       let fd = fs.openSync('vehicles.json', 'w');
       fs.writeSync(fd, jsonString);
+
+      // show the labeled ID table
+      let messageHTML = tableify(labeledIdObject);
+      document.getElementById("tableID").innerHTML = messageHTML;
+      document.getElementById('knownIdsTable').hidden = false;
 
       // update the count and message tables to reflect the new labels, if tables have been created
       if (tablesDrawn) {
@@ -173,7 +176,28 @@ function removeVehicleProfile() {
   document.getElementById('table-all-clear-filter-btn').addEventListener('click', () => {
     clearMsgTableFilters();
   });
-}
+
+  // Open the Modal
+  function showModal() {
+    modal.style.display = "block";
+  }
+
+  document.getElementById('close-modal-btn').addEventListener('click', hideModal);
+
+  // Close the modal and enter the new vehicle
+  function hideModal() {
+    addVehicleProfile();
+    newVehicleInput.value = '';
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+});
 
 // creates the table to show user how many times messages of each ID occurred
 function createCountTable(idCounts) {
@@ -407,7 +431,7 @@ function vehicleSelectionChanged(event) {
     document.getElementById('knownIdsTable').hidden = true;
   }
 
-  //Create the table and send to the HTML page
+  // Create the table and send to the HTML page
   let messageHTML = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTML;
 
@@ -424,6 +448,9 @@ function isEmpty(obj) {
 
 // clears the labels from both tables without recreating the whole table
 function clearIdLabels() {
+  document.getElementById('knownIdsTable').hidden = true;
+  document.getElementById("tableID").innerHTML = '';
+
   // we know all IDs that have been changed, so just reset the innerHTML of each row
   if (tablesDrawn) {
     Object.keys(labeledIDs).forEach(id => {
@@ -593,25 +620,6 @@ function clearMsgTableFilters() {
   msgTableHiddenRows.length = 0;
   msgTableFilters.by_id.length = 0;
   msgTableFilters.by_data_value.length = 0;
-}
-
-// Open the Modal
-function showModal() {
-  modal.style.display = "block";
-}
-
-// Close the modal and enter the new vehicle
-function hideModal() {
-  addVehicleProfile();
-  vehicleNameIn.value = '';
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
 }
 
 /* Given a list of integers, returns a new list that contains all the original numbers as well as
