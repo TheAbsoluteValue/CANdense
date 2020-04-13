@@ -118,6 +118,7 @@ function process(data) {
 function toggleReadBtnPressed() {
   if (!isReading){ // if we are not reading
     toggleReadBtn.innerHTML = "Pause reading"; //Toggle the button text
+    document.getElementById('live-messages').hidden = false;
     startReading();
   }
   else {  //else we are reading, set the state and pauseReading
@@ -310,6 +311,11 @@ function vehicleSelectionChanged(event) {
   //Create the table and send to the HTML page
   let messageHTML = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTML;
+  if (Object.keys(labeledIDs)[0].length == 0) {
+    document.getElementById('knownIdsTable').hidden = true;  
+  } else {
+    document.getElementById('knownIdsTable').hidden = false;
+  }
 }
 
 //Add a label

@@ -45,6 +45,34 @@ a:hover {
     min-width: 250px;
 }
 
+.root-div {
+    border: solid #2B60DE;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    width: 80%;
+}
+
+.label-inline {
+    display: inline-block;
+    width: 200px;
+    text-align: -webkit-auto;
+    text-decoration-style: bold;
+}
+
+.horizontal-container {
+    display: flex;
+    text-align: center;
+  }
+  
+.horizontal-5050-div {
+  display: inline-block;
+  width: 50%;
+  text-align: center;
+  padding: 10px;
+}
+
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
@@ -92,6 +120,19 @@ h4 {
     font-weight: bold;
     color: #2B60DE
 }
+
+h5 {
+    color: #2B60DE
+}
+
 table, th, td {
     border: 2px solid black
-  }
+}
+
+#log-path {
+    display: inline-block;
+}
+
+#filter-id {
+    display: inline-block;
+}
