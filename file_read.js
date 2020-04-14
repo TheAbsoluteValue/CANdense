@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let labelInput = document.getElementById('label-input');
   document.getElementById('add-label-btn').addEventListener('click', () => {
     if (selectedVehicle !== "None" && selectedVehicle) {
-      let id = idInput.value; // string
-      let label = labelInput.value;
+      let id = idInput.value.toUpperCase(); // string
+      let label = labelInput.value.toUpperCase();
       if (!id || !label) {
         alert('Must enter ID and label');
         return; // error; nothing more should happen
@@ -168,6 +168,45 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       alert("Please select a vehicle to add ID label to");
+    }
+  });
+
+  document.getElementById('remove-label-btn').addEventListener('click', () => {
+    let labelToRemove = labelInput.value.toUpperCase();
+    let labelExists = false;
+    let idToRemove;
+    Object.values(currentLabeledIDs).forEach((label, i) => {
+      if (label === labelToRemove) {
+        labelExists = true;
+        idToChange = Object.keys(currentLabeledIDs)[i];
+      }
+    });
+
+    if (labelExists) {
+      delete currentLabeledIDs[idToChange]
+      delete vehiclesJSON[selectedVehicle].labeled_ids[idToChange]
+
+      // make changes to the file storing all of this
+      let jsonString = JSON.stringify(vehiclesJSON);
+      let fd = fs.openSync('vehicles.json', 'w');
+      fs.writeSync(fd, jsonString);
+
+      // reflect this removal in the know labels table
+      let messageHTML = tableify(vehiclesJSON[selectedVehicle].labeled_ids);
+      document.getElementById("tableID").innerHTML = messageHTML;
+      if (Object.keys(currentLabeledIDs).length === 0) {
+        knownIdsTable.hidden = true;
+      }
+
+      // remove from the count table
+      document.getElementById(idToChange).textContent = idToChange;
+      // remove from the message table
+      Array.from(document.getElementsByClassName(idToChange)).forEach(td => {
+        td.textContent = idToChange;
+      })
+
+    } else {
+      alert("This label does not exist");
     }
   });
 
@@ -518,11 +557,6 @@ function clearIDLabelArray() {
   document.getElementById("tableID").innerHTML = '';
 }
 
-// construct the new label array and populate the "#knownIdsTable"
-function constructNewLabelArray() {
-
-}
-
 // adds a label to the row with the count of the given ID
 // only changes for a single id, populateTableLabels handles for ALL labeled IDs
 function populateCountTableLabels(updateID, newLabel) {
@@ -558,7 +592,7 @@ function updateCountTableFilters() {
 
   if (idFilter.value) {
     // split on space, or comma, or both
-    countTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
+    countTableFilters.by_id = idFilter.value.toUpperCase().split(/[\s|,]+/);
   }
 
   if (msgFreqFilter.value) {
@@ -576,11 +610,11 @@ function updateMessageTableFilters() {
 
   if (idFilter.value) {
     // split on space, or comma, or both
-    msgTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
+    msgTableFilters.by_id = idFilter.value.toUpperCase().split(/[\s|,]+/);
   }
 
   if (dataValFilter.value) {
-    msgTableFilters.by_data_value = dataValFilter.value.split(/[\s|,]+/);
+    msgTableFilters.by_data_value = dataValFilter.value.toUpperCase().split(/[\s|,]+/);
   }
 }
 
