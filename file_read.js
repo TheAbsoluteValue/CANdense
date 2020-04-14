@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let labelInput = document.getElementById('label-input');
   document.getElementById('add-label-btn').addEventListener('click', () => {
     if (selectedVehicle !== "None" && selectedVehicle) {
-      let id = idInput.value; // string
-      let label = labelInput.value;
+      let id = idInput.value.toUpperCase(); // string
+      let label = labelInput.value.toUpperCase();
       if (!id || !label) {
         alert('Must enter ID and label');
         return; // error; nothing more should happen
@@ -136,8 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (label === val) labelAlreadyUsed = true;
         return;
       });
-      console.log(labelAlreadyUsed);
-      console.log('--------')
 
       if (!labelAlreadyUsed) {
         let labeledIdObject = vehiclesJSON[selectedVehicle].labeled_ids;
@@ -558,7 +556,7 @@ function updateCountTableFilters() {
 
   if (idFilter.value) {
     // split on space, or comma, or both
-    countTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
+    countTableFilters.by_id = idFilter.value.toUpperCase().split(/[\s|,]+/);
   }
 
   if (msgFreqFilter.value) {
@@ -576,11 +574,11 @@ function updateMessageTableFilters() {
 
   if (idFilter.value) {
     // split on space, or comma, or both
-    msgTableFilters.by_id = idFilter.value.split(/[\s|,]+/);
+    msgTableFilters.by_id = idFilter.value.toUpperCase().split(/[\s|,]+/);
   }
 
   if (dataValFilter.value) {
-    msgTableFilters.by_data_value = dataValFilter.value.split(/[\s|,]+/);
+    msgTableFilters.by_data_value = dataValFilter.value.toUpperCase().split(/[\s|,]+/);
   }
 }
 
