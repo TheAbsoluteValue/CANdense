@@ -364,21 +364,23 @@ function addLabel() {
   document.getElementById("tableID").innerHTML = messageHTMLID;
 }
 
+//handles the removal of a label from an ID
 function removeLabel() {
-  let label = labelInput.value;
-  if(labels.indexOf(label.toUpperCase()) == -1) {
+  let label = labelInput.value; //The label to remove
+  if(labels.indexOf(label.toUpperCase()) == -1) { //Check to make sure the label has been given to an ID previously
     alert("This label does not exist");
     return;
   }
-  labels = labels.filter((string) => {return string != label.toUpperCase();});
-  for (const id in labeledIDs) {
-    if(labeledIDs[id].toUpperCase() == label.toUpperCase()) {
-      delete labeledIDs[id];
-      delete vehiclesJSON[selectedVehicle]["labeled_ids"][id];
-      fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
+  labels = labels.filter((string) => {return string != label.toUpperCase();}); //Filter out the label from the labels array
+  for (const id in labeledIDs) { //For each id in labeledIDs
+    if(labeledIDs[id].toUpperCase() == label.toUpperCase()) { //If label of labeledIDs[id] matches the search label
+      delete labeledIDs[id]; //delete the label from the labeledIDs at that id
+      delete vehiclesJSON[selectedVehicle]["labeled_ids"][id]; //delete the label from the JSON file
     }
   }
-  //Create the table and send to the HTML page
+  //Write the change to the JSON file
+  fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
+  //Update the labelled ids table
   let messageHTMLID = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTMLID;
 }
