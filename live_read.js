@@ -86,7 +86,7 @@ function process(data) {
   let messageData = dataSplit[2].slice(4); //Gather the data, The rest of the data payload after the 4th character
 
   if(isLogging) {
-    fs.writeSync(logStream, dataSplit + "\n");
+    fs.writeSync(logStream, dataSplit[0] + " " + dataSplit[1] + " " + dataSplit[2] + "\n");
   }
 
   //Change timestamp from unixtime to hr:min:sec:ms
@@ -151,7 +151,7 @@ function pauseReading() {
   isReading = false;
   isFilterable = true;
   if (isLogging) {
-    isLogging = false;
+    toggleLogBtnPressed();
   }
   logFile.unpipe();
   port.unpipe();
@@ -169,9 +169,8 @@ function toggleLogBtnPressed() {
     pathToLog = document.getElementById("logfile-path").value; //Grab the entered logFile Name
     if (!pathToLog) {pathToLog = `log\\CAN_${Date.now()}.log`;} //If no logFile name was entered
     if (!pathToLog.endsWith('.log')) {pathToLog = pathToLog.concat('.log');} //If there is no file ending entered or improper, add it
+    logStream = fs.openSync(pathToLog, 'a');
     isLogging = true;
-    console.log(pathToLog);
-    logstream = fs.openSync(pathTolog, 'a');
     toggleLogBtn.innerHTML = "Pause Logging"; //Toggle the button text
     if (!isReading) {toggleReadBtnPressed();} //If we are not reading yet
   }
@@ -191,7 +190,7 @@ function toggleLogBtnPressed() {
 
 // takes care of cleaning things up when the user is done logging
 function endLogger() {
-  fs.closeSync(logstream);
+  fs.closeSync(logStream);
   toggleLogBtn.innerHTML = "Start Logging";
   alert("Log Saved!");
 }
