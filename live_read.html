@@ -55,7 +55,8 @@
             <!-- DOM elements relevant to adding labels to IDs -->
             <label for="id-input">ID<br><input type="text" id="id-input" name="id-input" length=3></label>
             <label for="label-input">Label<br><input type="text" id="label-input" name="label-input" length=16></label> <br>
-            <button id="add-label-btn" onclick="addLabel()">Add ID label</button>
+            <button id="add-label-btn" title="Adds the given label to the given ID" onclick="addLabel()">+</button>
+            <button id="remove-label-btn" title="Removes the given label" onclick="removeLabel()">-</button>
           </div>
         </div>
       </div>
@@ -91,8 +92,8 @@
         <label for="msg-freq-filter" title="Shows messages that occured this often" style="padding-left: 20px;">ID Frequency</label>
         <input type="text" name="msg-freq-filter" id="msg-freq-filter" size="5"></input><br>
         <div>
-          <label style="padding-right: 2px;">OR <input type="radio" value="OR" name="table-count-filter-operator" checked></label>
-          <label>AND <input type="radio" value="AND" name="table-count-filter-operator"></label>
+          <label style="padding-right: 2px;">OR <input type="radio" value="OR" name="table-count-filter-operator" checked onclick="orClick()"></label>
+          <label>AND <input type="radio" value="AND" name="table-count-filter-operator" onclick="andClick()"></label>
         </div>
         <label class="label-inline" for="msg-freq-tolerance" title="Turns the given frequency into a range of Freq +/- tolerance">Tolerance</label>
         <input type="number" name="msg-freq-tolerance" id="msg-freq-tolerance" size="5"></input>

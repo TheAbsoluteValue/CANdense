@@ -6,12 +6,14 @@ const parsers = SerialPort.parsers; //For the Port Parser
 var remote = require('electron').remote, arguments = remote.getGlobal('mode').prop1; //gather the mode (test or empty where emtpy is normal run)
 var mode = arguments[2];
 const TEST_LOG_PATH = 'test_CANdump1.log'; //Path to the test input file representing the Fake Car for the Mock Port
-let k = 0;
+
 //Holds the latest copy message of each unique id/label
 const messages = {};
 let dataValues = {};
 let filteredMessages = {};
 let labeledIDs = {};
+let labels = [];
+let ids = [];
 let selectedVehicle;
 //Files and locations
 let pathToPort = ' '; //empty pending which operating system
@@ -23,6 +25,7 @@ let logStream;  //output stream to pathToLog
 let isReading = false;
 let isLogging = false;
 let isFilterable = true; //False when live reading to prevent filters colliding with live data
+let and = false;
 //Buttons and inputs!
 let toggleReadBtn = document.getElementById('toggleReadBtn');
 let toggleLogBtn = document.getElementById('toggleLogBtn');
@@ -233,7 +236,7 @@ function filter() {
   let currentMinutes = currentTime.getMinutes();
   let currentSeconds = currentTime.getSeconds();
   let currentMillis = currentTime.getMilliseconds();
-  let idFilter = idFilterInput.value;
+  let idFilter = idFilterInput.value.toUpperCase();
   let freqFilter = Number.parseInt(frequencyInput.value);
   let toleranceFilter = Number.parseInt(toleranceInput.value);
   let timeFilter = Number.parseInt(timeInput.value);
@@ -246,29 +249,36 @@ function filter() {
     let count = message.count;
     let timeDifference = (currentHours - date[0]) * 3600 + (currentMinutes - date[1]) * 60 + (currentSeconds - date[2]) + (currentMillis - date[3]) / 100;
 
-    if(!idFilter || idFilter == id) {
-      if(!freqFilter) {
-        if(!dataFilter || data.indexOf(dataFilter) != -1) {
-          if(!timeFilter || timeDifference < timeFilter) {
-            filteredMessages[id] = message;
+    if(and) {
+      if(!idFilter || idFilter == id) {
+        if(!freqFilter) {
+          if(!dataFilter || data.indexOf(dataFilter) != -1) {
+            if(!timeFilter || timeDifference < timeFilter) {
+              filteredMessages[id] = message;
+            }
+          }
+        }
+        else if(!toleranceFilter && freqFilter == count){
+          if(!dataFilter || data.indexOf(dataFilter) != -1) {
+            if(!timeFilter || timeDifference < timeFilter) {
+              filteredMessages[id] = message;
+            }
+          }
+        }
+        else if(count <= freqFilter + toleranceFilter &&  count >= freqFilter - toleranceFilter) {
+          if(!dataFilter || data.indexOf(dataFilter) != -1) {
+            if(!timeFilter || timeDifference < timeFilter) {
+              filteredMessages[id] = message;
+            }
           }
         }
       }
-      else if(!toleranceFilter && freqFilter == count){
-        if(!dataFilter || data.indexOf(dataFilter) != -1) {
-          if(!timeFilter || timeDifference < timeFilter) {
-            filteredMessages[id] = message;
-          }
-        }
+    } 
+    else {
+      if ((idFilter && idFilter == id) || (freqFilter && (freqFilter == count || (toleranceFilter && count < freqFilter + toleranceFilter && count > freqFilter - toleranceFilter)) || (timeFilter && timeDifference < timeFilter) || (dataFilter && data.indexOf(dataFilter) != -1))) {
+        filteredMessages[id] = message;
       }
-      else if(count <= freqFilter + toleranceFilter &&  count >= freqFilter - toleranceFilter) {
-        if(!dataFilter || data.indexOf(dataFilter) != -1) {
-          if(!timeFilter || timeDifference < timeFilter) {
-            filteredMessages[id] = message;
-          }
-        }
-      }
-    }//End ifs
+    }
     let messageHTML = tableify(filteredMessages);
     document.getElementById("table").innerHTML = messageHTML;
   }
@@ -279,6 +289,14 @@ function clearFilter() {
   filteredMessages = {};
   let messageHTML = tableify(messages);
   document.getElementById("table").innerHTML = messageHTML;
+}
+
+function orClick() {
+  and = false;
+}
+
+function andClick() {
+  and = true;
 }
 
 /*
@@ -293,6 +311,10 @@ function retrieveVehicles() {
   populateDropDown();
   selectedVehicle = vehicleDropDown.options[vehicleDropDown.selectedIndex].value;
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  for(const id in labeledIDs) {
+    ids.push(id);
+    labels.push(labeledIDs[id].toUpperCase());
+  }
   //Create the table and send to the HTML page
   let messageHTML = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTML;
@@ -308,6 +330,12 @@ function populateDropDown() {
 function vehicleSelectionChanged(event) {
   selectedVehicle = event.target.value;
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
+  ids = [];
+  labels = [];
+  for(const id in labeledIDs) {
+    ids.push(id);
+    labels.push(labeledIDs[id].toUpperCase());
+  }
   //Create the table and send to the HTML page
   let messageHTML = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTML;
@@ -320,8 +348,18 @@ function vehicleSelectionChanged(event) {
 
 //Add a label
 function addLabel() {
-  let id = idInput.value;
+  console.log(labels);
+  let id = idInput.value.toUpperCase();
   let label = labelInput.value;
+  if(labels.indexOf(label.toUpperCase()) != -1) {
+    alert("An ID already has that label");
+    return;
+  }
+  else if (ids.indexOf(id) != -1) {
+    alert("ID is already labelled");
+    return;
+  }
+  labels.push(label.toUpperCase());
   vehiclesJSON[selectedVehicle]["labeled_ids"][id] = label;
   fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
   labeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
@@ -335,6 +373,25 @@ function addLabel() {
   //Create the table and send to the HTML page
   let messageHTML = tableify(messages);
   document.getElementById("table").innerHTML = messageHTML;
+  //Create the table and send to the HTML page
+  let messageHTMLID = tableify(labeledIDs);
+  document.getElementById("tableID").innerHTML = messageHTMLID;
+}
+
+function removeLabel() {
+  let label = labelInput.value;
+  if(labels.indexOf(label.toUpperCase()) == -1) {
+    alert("This label does not exist");
+    return;
+  }
+  labels = labels.filter((string) => {return string != label.toUpperCase();});
+  for (const id in labeledIDs) {
+    if(labeledIDs[id].toUpperCase() == label.toUpperCase()) {
+      delete labeledIDs[id];
+      delete vehiclesJSON[selectedVehicle]["labeled_ids"][id];
+      fs.writeFileSync("vehicles.json", JSON.stringify(vehiclesJSON));
+    }
+  }
   //Create the table and send to the HTML page
   let messageHTMLID = tableify(labeledIDs);
   document.getElementById("tableID").innerHTML = messageHTMLID;
