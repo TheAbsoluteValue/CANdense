@@ -70,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
       fs.writeSync(fd, Buffer.from(newJSONtext));
       fs.closeSync(fd);
 
+      clearTableLabels();
+      clearIDLabelArray();
+
       // update the dropdown to include the new vehicle
       populateVehicleProfileDropdown();
       // make the newly added vehicle the selected one
@@ -506,6 +509,7 @@ function vehicleSelectionChanged(event) {
   clearIDLabelArray(); // clears currentLabeledIDs/"#knownIdsTable" in HTML
 
   // get new vehicle name and any associated ID labels
+  console.log(selectedVehicle);
   selectedVehicle = event.target.value;
   currentLabeledIDs = vehiclesJSON[selectedVehicle].labeled_ids;
 
@@ -536,7 +540,9 @@ function isEmpty(obj) {
 // access count table rows through their ID attribute
 // access message table rows through their class attribute
 function clearTableLabels() {
+  alert('adfasdf')
   if (!isEmpty(currentLabeledIDs)) {
+    alert('fasdf')
     // keys of currentLabeledIDs are the raw ID name (e.g. F3A)
     Object.keys(currentLabeledIDs).forEach(id => {
       // clear the labels in the count table by changing the single <td> holding the ID
