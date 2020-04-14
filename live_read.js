@@ -18,7 +18,6 @@ let selectedVehicle;
 //Files and locations
 let pathToPort = ' '; //empty pending which operating system
 let pathToLog; //Uninitialized pending call to setUplogging
-let fdLog;  // file descriptor the log file, integer id representing the file returned by fs.openSync()
 let vehiclesJSON; //vehicles.json
 let logStream;  //output stream to pathToLog
 //Current state flags
@@ -86,6 +85,10 @@ function process(data) {
   let id = dataSplit[2].slice(0, 3); //Gather the id, first three characters of the data payload
   let messageData = dataSplit[2].slice(4); //Gather the data, The rest of the data payload after the 4th character
 
+  if(isLogging) {
+    fs.writeSync(logStream, dataSplit + "\n");
+  }
+
   //Change timestamp from unixtime to hr:min:sec:ms
   let date = new Date(parseFloat(unixTimeStamp));
   let hours = date.getHours();
@@ -148,7 +151,7 @@ function pauseReading() {
   isReading = false;
   isFilterable = true;
   if (isLogging) {
-    pauseLogger();
+    isLogging = false;
   }
   logFile.unpipe();
   port.unpipe();
@@ -162,50 +165,34 @@ function pauseReading() {
 
 //Handle the toggle between logging and not
 function toggleLogBtnPressed() {
-	if (!isLogging) {  //if we are not logging
+  if (toggleLogBtn.innerHTML == "Start Logging") {
+    pathToLog = document.getElementById("logfile-path").value; //Grab the entered logFile Name
+    if (!pathToLog) {pathToLog = `log\\CAN_${Date.now()}.log`;} //If no logFile name was entered
+    if (!pathToLog.endsWith('.log')) {pathToLog = pathToLog.concat('.log');} //If there is no file ending entered or improper, add it
+    isLogging = true;
+    console.log(pathToLog);
+    logstream = fs.openSync(pathTolog, 'a');
     toggleLogBtn.innerHTML = "Pause Logging"; //Toggle the button text
-    if (!pathToLog) {setUpLogger();} //If the log path is not setup, set it up
     if (!isReading) {toggleReadBtnPressed();} //If we are not reading yet
-    startLogger();
   }
-  else {  //else we are logging
+  else if (toggleLogBtn.innerHTML == "Pause Logging") {
+    isLogging = false;
     toggleLogBtn.innerHTML = "Resume Logging"; //Toggle the button text
-    pauseLogger();
   }
-}
-
-//Handle the setup for the log file output, called by setLogbtn on click and toggleLogBtnPressed
-function setUpLogger() {
-  pathToLog = document.getElementById("logfile-path").value; //Grab the entered logFile Name
-  if (!pathToLog) {pathToLog = `log\\CAN_${Date.now()}.log`;} //If no logFile name was entered
-  if (!pathToLog.endsWith('.log')) {pathToLog = pathToLog.concat('.log');} //If there is no file ending entered or improper, add it
-  fdLog = fs.openSync(pathToLog, 'w'); // truncate
-}
-
-//Handles the writing and piping
-function startLogger() {
-  isLogging = true;
-  if (!logStream) { //Create the writeStream if there isn't one
-    logStream = fs.createWriteStream(null, {fdLog: fdLog});
-    logStream.on('data', data => {
-      fs.writeFile(fdLog, data + "\n");
-    });
+  else if (toggleLogBtn.innerHTML == "Resume Logging") {
+    isLogging = true;
+    toggleLogBtn.innerHTML = "Pause Logging"; //Toggle the button text
+    if (!isReading) {toggleReadBtnPressed();} //If we are not reading yet
   }
-  parser.pipe(logStream); //pipe the parser to the writeStream
-}
-
-// stop writing from the input to the file; used to end reading the stream
-function pauseLogger() {
-  isLogging = false;
-  parser.unpipe(logStream);
+  else {
+    alert("Oh God, what have I done?");
+  }
 }
 
 // takes care of cleaning things up when the user is done logging
 function endLogger() {
-  pauseLogger();
+  fs.closeSync(logstream);
   toggleLogBtn.innerHTML = "Start Logging";
-  logStream.end(); // prevent memory leak
-
   alert("Log Saved!");
 }
 
